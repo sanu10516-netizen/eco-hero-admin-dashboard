@@ -1,0 +1,36 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7fb;
+  color: #333;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+.layout {
+  min-height: 100vh;
+}
+
+.main {
+  margin-left: 240px;
+  min-height: 100vh;
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    width: 190px;
+  }
+
+  .main {
+    margin-left: 190px;
+  }
+}

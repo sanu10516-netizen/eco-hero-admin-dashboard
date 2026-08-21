@@ -1,0 +1,42 @@
+.filter-box {
+  background: white;
+  padding: 15px;
+  border-radius: 9px;
+  margin-bottom: 18px;
+}
+
+.filter-box input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+}
+
+.table-box {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 9px;
+  overflow-x: auto;
+}
+
+.table-box table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-box th,
+.table-box td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table-box th {
+  background: #f8faf9;
+  color: #555;
+}
+
+.table-box td {
+  color: #666;
+}
