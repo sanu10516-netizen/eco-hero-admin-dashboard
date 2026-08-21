@@ -1,0 +1,119 @@
+.page-content {
+  padding: 30px;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.page-heading h1 {
+  color: #222;
+}
+
+.page-heading p {
+  color: #888;
+  margin-top: 5px;
+}
+
+.green-btn {
+  background: #247a4d;
+  color: white;
+  border: 0;
+  padding: 11px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.filter-box {
+  background: white;
+  padding: 15px;
+  border-radius: 9px;
+  margin-bottom: 18px;
+  display: flex;
+  gap: 10px;
+}
+
+.filter-box input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+}
+
+.table-box {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 9px;
+  overflow-x: auto;
+}
+
+.table-box table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
+}
+
+.table-box th,
+.table-box td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table-box th {
+  background: #f8faf9;
+  color: #555;
+}
+
+.table-box td {
+  color: #666;
+}
+
+.message {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+@media (max-width: 700px) {
+  .page-content {
+    padding: 70px 15px 25px;
+  }
+
+  .page-heading {
+    display: block;
+  }
+
+  .page-heading h1 {
+    font-size: 22px;
+  }
+
+  .page-heading p {
+    font-size: 13px;
+    margin-bottom: 15px;
+  }
+
+  .green-btn {
+    width: 100%;
+  }
+
+  .filter-box {
+    display: block;
+    padding: 12px;
+  }
+
+  .filter-box input {
+    margin-bottom: 8px;
+  }
+
+  .table-box th,
+  .table-box td {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

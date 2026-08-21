@@ -1,0 +1,133 @@
+.page-content {
+  padding: 30px;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.page-heading h1 {
+  color: #222;
+}
+
+.page-heading p {
+  color: #888;
+  margin-top: 5px;
+}
+
+.green-btn {
+  background: #247a4d;
+  color: white;
+  border: 0;
+  padding: 11px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.post-list {
+  display: grid;
+  gap: 15px;
+}
+
+.post-card {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.post-card p {
+  color: #666;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.reported,
+.banned {
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.reported {
+  background: #fff3cd;
+  color: #946c00;
+}
+
+.banned {
+  background: #ffe0e0;
+  color: #c33;
+}
+
+.post-buttons {
+  margin-top: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.post-buttons button {
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #eee;
+}
+
+.delete-btn {
+  background: #fff0f0 !important;
+  color: #d64545;
+}
+
+.message {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+@media (max-width: 700px) {
+  .page-content {
+    padding: 70px 15px 25px;
+  }
+
+  .page-heading {
+    display: block;
+  }
+
+  .page-heading h1 {
+    font-size: 22px;
+  }
+
+  .page-heading p {
+    font-size: 13px;
+    margin-bottom: 15px;
+  }
+
+  .green-btn {
+    width: 100%;
+  }
+
+  .post-card {
+    padding: 16px;
+  }
+
+  .post-buttons {
+    flex-direction: column;
+  }
+
+  .post-buttons button {
+    width: 100%;
+  }
+}

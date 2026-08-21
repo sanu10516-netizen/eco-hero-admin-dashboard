@@ -1,0 +1,138 @@
+.page-content {
+  padding: 30px;
+}
+
+.page-heading {
+  margin-bottom: 22px;
+}
+
+.page-heading h1 {
+  color: #222;
+}
+
+.page-heading p {
+  color: #888;
+  margin-top: 5px;
+}
+
+.content-section {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  overflow: hidden;
+}
+
+.section-head {
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.section-head h2 {
+  font-size: 18px;
+  color: #333;
+}
+
+.add-area {
+  display: flex;
+  gap: 8px;
+}
+
+.add-area input {
+  padding: 9px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+}
+
+.add-area button {
+  background: #247a4d;
+  color: white;
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+.content-section > table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+}
+
+.content-section {
+  overflow-x: auto;
+}
+
+th,
+td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+th {
+  background: #f8faf9;
+  color: #555;
+}
+
+td {
+  color: #666;
+}
+
+.delete-btn {
+  border: 0;
+  background: #fff0f0;
+  color: #d64545;
+  padding: 7px 11px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.status {
+  color: #269653;
+}
+
+.message {
+  padding: 15px;
+  color: #d64545;
+}
+
+@media (max-width: 700px) {
+  .page-content {
+    padding: 70px 15px 25px;
+  }
+
+  .page-heading h1 {
+    font-size: 22px;
+  }
+
+  .section-head {
+    display: block;
+    padding: 15px;
+  }
+
+  .section-head h2 {
+    margin-bottom: 12px;
+  }
+
+  .add-area {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .add-area input,
+  .add-area button {
+    width: 100%;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

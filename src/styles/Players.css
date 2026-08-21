@@ -1,0 +1,113 @@
+.page-content {
+  padding: 30px;
+}
+
+.page-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.page-heading h1 {
+  color: #222;
+}
+
+.page-heading p {
+  color: #888;
+  margin-top: 5px;
+}
+
+.green-btn {
+  background: #247a4d;
+  color: white;
+  border: 0;
+  padding: 11px 16px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.filter-box {
+  background: white;
+  padding: 15px;
+  border-radius: 9px;
+  margin-bottom: 18px;
+}
+
+.filter-box input {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  outline: none;
+}
+
+.table-box {
+  background: white;
+  border-radius: 9px;
+  overflow-x: auto;
+  border: 1px solid #eee;
+}
+
+table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+th {
+  background: #f8faf9;
+  color: #555;
+}
+
+td {
+  color: #666;
+}
+
+.message {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+}
+
+@media (max-width: 700px) {
+  .page-content {
+    padding: 70px 15px 25px;
+  }
+
+  .page-heading {
+    display: block;
+  }
+
+  .page-heading h1 {
+    font-size: 22px;
+  }
+
+  .page-heading p {
+    font-size: 13px;
+    margin-bottom: 15px;
+  }
+
+  .green-btn {
+    width: 100%;
+  }
+
+  .filter-box {
+    padding: 12px;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

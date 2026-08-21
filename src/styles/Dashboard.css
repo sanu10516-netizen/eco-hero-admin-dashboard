@@ -1,0 +1,161 @@
+.dashboard-content {
+  padding: 30px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.welcome {
+  margin-bottom: 25px;
+}
+
+.welcome h1 {
+  font-size: 27px;
+  color: #222;
+}
+
+.welcome p {
+  color: #777;
+  margin-top: 7px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 0;
+}
+
+.stat-icon {
+  font-size: 27px;
+  background: #eaf7ef;
+  padding: 12px;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.stat-card p {
+  color: #777;
+  font-size: 13px;
+}
+
+.stat-card h2 {
+  margin-top: 5px;
+  color: #222;
+}
+
+.section-title {
+  margin: 30px 0 15px;
+  font-size: 20px;
+}
+
+.modules {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.module-card {
+  background: white;
+  padding: 22px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  min-width: 0;
+}
+
+.module-icon {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.module-card h3 {
+  color: #333;
+}
+
+.module-card p {
+  color: #888;
+  font-size: 13px;
+  margin: 8px 0 18px;
+}
+
+.module-card button {
+  border: 0;
+  background: #247a4d;
+  color: white;
+  padding: 9px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.module-card button:hover {
+  background: #1d633e;
+}
+
+@media (max-width: 1100px) {
+  .stats,
+  .modules {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-content {
+    padding: 70px 15px 25px;
+  }
+
+  .welcome {
+    margin-bottom: 20px;
+  }
+
+  .welcome h1 {
+    font-size: 23px;
+    line-height: 1.3;
+  }
+
+  .welcome p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-icon {
+    font-size: 23px;
+    padding: 10px;
+  }
+
+  .section-title {
+    margin: 25px 0 13px;
+    font-size: 18px;
+  }
+
+  .modules {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .module-card {
+    padding: 18px;
+  }
+
+  .module-card p {
+    margin-bottom: 14px;
+  }
+}
