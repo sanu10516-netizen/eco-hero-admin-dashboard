@@ -20,11 +20,36 @@ function Players() {
 
           return {
             id: doc.id,
-            username: user.Username || "Unknown",
-            email: user.Email || "No email",
-            score: user.Totalscore || 0,
-            level: user.Currentlevel || 0,
-            coins: user.Coins || 0,
+
+            username:
+              user.username ||
+              user.Username ||
+              user.name ||
+              "Unknown",
+
+            email:
+              user.email ||
+              user.Email ||
+              "No email",
+
+            score:
+              user.totalscores ||
+              user.totalScore ||
+              user.Totalscore ||
+              user.score ||
+              0,
+
+            level:
+              user.currentLevel ||
+              user.Currentlevel ||
+              user["current level"] ||
+              user.level ||
+              0,
+
+            coins:
+              user.coins ||
+              user.Coins ||
+              0,
           };
         });
 
@@ -32,7 +57,7 @@ function Players() {
         setLoading(false);
       },
       (error) => {
-        console.log("Error fetching players:", error);
+        console.log("Error:", error);
         setLoading(false);
       }
     );

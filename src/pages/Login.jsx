@@ -1,8 +1,15 @@
 import "./login.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+
+import {
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+
+import { doc, getDoc } from "firebase/firestore";
+
+import { auth, db } from "../firebase";
 
 function Login() {
   const navigate = useNavigate();
@@ -17,10 +24,24 @@ function Login() {
     setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard");
-    } catch (error) {
-      setError("Invalid email or password.");
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const user = userCredential.user;
+
+      const adminDoc = await getDoc(doc(db, "admins", user.uid));
+
+      if (adminDoc.exists()) {
+        navigate("/dashboard");
+      } else {
+        await signOut(auth);
+        setError("Access denied. Only admin can login.");
+      }
+    } catch (err) {
+      setError("Login failed: " + err.message);
     }
   };
 

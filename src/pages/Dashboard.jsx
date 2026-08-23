@@ -16,10 +16,45 @@ function Dashboard() {
   const [totalPosts, setTotalPosts] = useState(0);
 
   useEffect(() => {
+    let users1 = [];
+    let users2 = [];
+
+    const updateTotalPlayers = () => {
+      const allUsers = [...users1, ...users2];
+
+      const uniqueUsers = new Map();
+
+      allUsers.forEach((user) => {
+        const key = user.email
+          ? user.email.trim().toLowerCase()
+          : user.id;
+        uniqueUsers.set(key, user);
+      });
+
+      setTotalPlayers(uniqueUsers.size);
+    };
+
     const unsubscribeUsers = onSnapshot(
       collection(db, "Users"),
       (snapshot) => {
-        setTotalPlayers(snapshot.size);
+        users1 = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        updateTotalPlayers();
+      }
+    );
+
+    const unsubscribeusers = onSnapshot(
+      collection(db, "users"),
+      (snapshot) => {
+        users2 = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        updateTotalPlayers();
       }
     );
 
@@ -39,6 +74,7 @@ function Dashboard() {
 
     return () => {
       unsubscribeUsers();
+      unsubscribeusers();
       unsubscribeLevels();
       unsubscribePosts();
     };
@@ -77,7 +113,6 @@ function Dashboard() {
             {stats.map((item) => (
               <div className="stat-card" key={item[1]}>
                 <div className="stat-icon">{item[0]}</div>
-
                 <div>
                   <p>{item[1]}</p>
                   <h2>{item[2]}</h2>
@@ -92,7 +127,6 @@ function Dashboard() {
             {modules.map((item) => (
               <div className="module-card" key={item[3]}>
                 <div className="module-icon">{item[0]}</div>
-
                 <h3>{item[1]}</h3>
                 <p>{item[2]}</p>
 
