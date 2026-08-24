@@ -90,7 +90,7 @@ function Login() {
                 className="show-password"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? "👁️" : "🔒"}
               </button>
             </div>
           </div>

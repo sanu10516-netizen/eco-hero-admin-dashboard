@@ -1,5 +1,6 @@
 .login-container {
   min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -177,7 +178,7 @@
 @media (max-width: 700px) {
   .login-container {
     padding: 15px;
-    background-position: center;
+    background-position: top center;
   }
 
   .login-box {
