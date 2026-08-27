@@ -99,7 +99,7 @@
 
 @media (max-width: 700px) {
   .page-content {
-    padding: 70px 15px 25px;
+    padding: 75px 15px 25px;
   }
 
   .page-heading {
@@ -107,7 +107,7 @@
   }
 
   .page-heading h1 {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .page-heading p {
@@ -117,10 +117,16 @@
 
   .green-btn {
     width: 100%;
+    padding: 13px;
   }
 
   .post-card {
     padding: 16px;
+    border-radius: 12px;
+  }
+
+  .post-header {
+    gap: 6px;
   }
 
   .post-buttons {
@@ -129,5 +135,6 @@
 
   .post-buttons button {
     width: 100%;
+    padding: 12px;
   }
 }

@@ -12,69 +12,60 @@ function Dashboard() {
   const navigate = useNavigate();
 
   const [totalPlayers, setTotalPlayers] = useState(0);
+  const [activePlayers, setActivePlayers] = useState(0);
   const [totalLevels, setTotalLevels] = useState(0);
   const [totalPosts, setTotalPosts] = useState(0);
 
   useEffect(() => {
-    let users1 = [];
-    let users2 = [];
+    let usersA = [];
+    let usersB = [];
+    let sessions = [];
 
-    const updateTotalPlayers = () => {
-      const allUsers = [...users1, ...users2];
-
+    const updateStats = () => {
+      const merged = [...usersA, ...usersB];
       const uniqueUsers = new Map();
 
-      allUsers.forEach((user) => {
-        const key = user.email
-          ? user.email.trim().toLowerCase()
-          : user.id;
+      merged.forEach((user) => {
+        const key = user.email ? user.email.trim().toLowerCase() : user.id;
         uniqueUsers.set(key, user);
       });
 
       setTotalPlayers(uniqueUsers.size);
+
+      const onlineUserIds = new Set(
+        sessions.filter((session) => !session.endTime).map((session) => session.userId)
+      );
+
+      setActivePlayers(onlineUserIds.size);
     };
 
-    const unsubscribeUsers = onSnapshot(
-      collection(db, "Users"),
-      (snapshot) => {
-        users1 = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    const unsubscribeUsersA = onSnapshot(collection(db, "Users"), (snapshot) => {
+      usersA = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      updateStats();
+    });
 
-        updateTotalPlayers();
-      }
-    );
+    const unsubscribeUsersB = onSnapshot(collection(db, "users"), (snapshot) => {
+      usersB = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      updateStats();
+    });
 
-    const unsubscribeusers = onSnapshot(
-      collection(db, "users"),
-      (snapshot) => {
-        users2 = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+    const unsubscribeSessions = onSnapshot(collection(db, "gameSessions"), (snapshot) => {
+      sessions = snapshot.docs.map((doc) => doc.data());
+      updateStats();
+    });
 
-        updateTotalPlayers();
-      }
-    );
+    const unsubscribeLevels = onSnapshot(collection(db, "Levels"), (snapshot) => {
+      setTotalLevels(snapshot.size);
+    });
 
-    const unsubscribeLevels = onSnapshot(
-      collection(db, "Levels"),
-      (snapshot) => {
-        setTotalLevels(snapshot.size);
-      }
-    );
-
-    const unsubscribePosts = onSnapshot(
-      collection(db, "CommunityPosts"),
-      (snapshot) => {
-        setTotalPosts(snapshot.size);
-      }
-    );
+    const unsubscribePosts = onSnapshot(collection(db, "CommunityPosts"), (snapshot) => {
+      setTotalPosts(snapshot.size);
+    });
 
     return () => {
-      unsubscribeUsers();
-      unsubscribeusers();
+      unsubscribeUsersA();
+      unsubscribeUsersB();
+      unsubscribeSessions();
       unsubscribeLevels();
       unsubscribePosts();
     };
@@ -82,7 +73,7 @@ function Dashboard() {
 
   const stats = [
     ["👥", "Total Players", totalPlayers],
-    ["🟢", "Active Players", "0"],
+    ["🟢", "Active Players", activePlayers],
     ["🎮", "Total Levels", totalLevels],
     ["💬", "Community Posts", totalPosts],
   ];

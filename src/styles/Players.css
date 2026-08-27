@@ -81,7 +81,7 @@ td {
 
 @media (max-width: 700px) {
   .page-content {
-    padding: 70px 15px 25px;
+    padding: 75px 15px 25px;
   }
 
   .page-heading {
@@ -89,7 +89,7 @@ td {
   }
 
   .page-heading h1 {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .page-heading p {
@@ -99,15 +99,22 @@ td {
 
   .green-btn {
     width: 100%;
+    padding: 13px;
   }
 
   .filter-box {
     padding: 12px;
   }
 
+  .table-box {
+    border-radius: 10px;
+    -webkit-overflow-scrolling: touch;
+  }
+
   th,
   td {
     padding: 12px;
     font-size: 13px;
+    white-space: nowrap;
   }
 }

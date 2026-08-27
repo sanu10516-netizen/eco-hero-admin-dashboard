@@ -82,7 +82,7 @@
 
 @media (max-width: 700px) {
   .page-content {
-    padding: 70px 15px 25px;
+    padding: 75px 15px 25px;
   }
 
   .page-heading {
@@ -90,7 +90,7 @@
   }
 
   .page-heading h1 {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .page-heading p {
@@ -100,20 +100,23 @@
 
   .green-btn {
     width: 100%;
+    padding: 13px;
   }
 
   .filter-box {
-    display: block;
+    display: flex;
+    flex-direction: column;
     padding: 12px;
   }
 
   .filter-box input {
-    margin-bottom: 8px;
+    margin-bottom: 0;
   }
 
   .table-box th,
   .table-box td {
     padding: 12px;
     font-size: 13px;
+    white-space: nowrap;
   }
 }

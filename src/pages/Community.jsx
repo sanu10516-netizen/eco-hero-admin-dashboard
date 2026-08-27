@@ -4,6 +4,8 @@ import {
   deleteDoc,
   doc,
   onSnapshot,
+  setDoc,
+  deleteField,
   updateDoc,
 } from "firebase/firestore";
 
@@ -14,30 +16,32 @@ import "../styles/community.css";
 
 function Community() {
   const [posts, setPosts] = useState([]);
+  const [bannedPlayers, setBannedPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showReportedOnly, setShowReportedOnly] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
+    const unsubPosts = onSnapshot(
       collection(db, "CommunityPosts"),
       (snapshot) => {
-        const data = snapshot.docs.map((document) => ({
-          id: document.id,
-          ...document.data(),
-        }));
-
-        setPosts(data);
+        setPosts(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
         setLoading(false);
       },
       (err) => {
-        console.error("Error fetching community posts:", err);
         setError(`Community posts error: ${err.message}`);
         setLoading(false);
       }
     );
 
-    return () => unsubscribe();
+    const unsubBans = onSnapshot(collection(db, "bannedPlayers"), (snapshot) => {
+      setBannedPlayers(snapshot.docs.map((d) => d.id));
+    });
+
+    return () => {
+      unsubPosts();
+      unsubBans();
+    };
   }, []);
 
   const deletePost = async (id) => {
@@ -45,22 +49,35 @@ function Community() {
       setError("");
       await deleteDoc(doc(db, "CommunityPosts", id));
     } catch (err) {
-      console.error("Delete post error:", err);
       setError(`Delete post failed: ${err.message}`);
     }
   };
 
-  const banPlayer = async (post) => {
+  const isBanned = (playerName) =>
+    bannedPlayers.includes((playerName || "").trim().toLowerCase());
+
+  const toggleBanPlayer = async (playerName) => {
+    if (!playerName) return;
+    const key = playerName.trim().toLowerCase();
+
     try {
       setError("");
-      await updateDoc(doc(db, "CommunityPosts", post.id), {
-        banned: !post.banned,
-      });
+      if (isBanned(playerName)) {
+        await deleteDoc(doc(db, "bannedPlayers", key));
+      } else {
+        await setDoc(doc(db, "bannedPlayers", key), {
+          username: playerName,
+          bannedAt: new Date(),
+        });
+      }
     } catch (err) {
-      console.error("Ban player error:", err);
       setError(`Ban player failed: ${err.message}`);
     }
   };
+
+  const filteredPosts = posts.filter(
+    (post) => !showReportedOnly || post.reported
+  );
 
   return (
     <div className="layout">
@@ -84,26 +101,20 @@ function Community() {
             </button>
           </div>
 
-          {error && (
-            <p className="message">⚠️ {error}</p>
-          )}
+          {error && <p className="message">⚠️ {error}</p>}
 
           {loading ? (
             <p className="message">Loading posts...</p>
           ) : (
             <div className="post-list">
-              {posts
-                .filter((post) => !showReportedOnly || post.reported)
-                .map((post) => (
+              {filteredPosts.map((post) => (
                 <div className="post-card" key={post.id}>
                   <div className="post-header">
                     <b>👤 {post.player || "Unknown"}</b>
 
-                    {post.reported && (
-                      <span className="reported">⚠ Reported</span>
-                    )}
+                    {post.reported && <span className="reported">⚠ Reported</span>}
 
-                    {post.banned && (
+                    {isBanned(post.player) && (
                       <span className="banned">Banned</span>
                     )}
                   </div>
@@ -111,26 +122,20 @@ function Community() {
                   <p>{post.text}</p>
 
                   <div className="post-buttons">
-                    <button onClick={() => banPlayer(post)}>
-                      {post.banned ? "Unban Player" : "Ban Player"}
+                    <button onClick={() => toggleBanPlayer(post.player)}>
+                      {isBanned(post.player) ? "Unban Player" : "Ban Player"}
                     </button>
 
-                    <button
-                      className="delete-btn"
-                      onClick={() => deletePost(post.id)}
-                    >
+                    <button className="delete-btn" onClick={() => deletePost(post.id)}>
                       Delete Post
                     </button>
                   </div>
                 </div>
               ))}
 
-              {posts.filter((post) => !showReportedOnly || post.reported)
-                .length === 0 && (
+              {filteredPosts.length === 0 && (
                 <p className="message">
-                  {showReportedOnly
-                    ? "No reported posts found."
-                    : "No community posts found."}
+                  {showReportedOnly ? "No reported posts found." : "No community posts found."}
                 </p>
               )}
             </div>

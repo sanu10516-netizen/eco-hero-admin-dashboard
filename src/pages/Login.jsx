@@ -1,5 +1,5 @@
 import "./login.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -18,10 +18,54 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [lockedUntil, setLockedUntil] = useState(null);
+  const [remaining, setRemaining] = useState(0);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("loginLockedUntil");
+    if (stored && Number(stored) > Date.now()) {
+      setLockedUntil(Number(stored));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!lockedUntil) return;
+
+    const interval = setInterval(() => {
+      const secondsLeft = Math.ceil((lockedUntil - Date.now()) / 1000);
+
+      if (secondsLeft <= 0) {
+        setLockedUntil(null);
+        localStorage.removeItem("loginLockedUntil");
+        localStorage.removeItem("failedAttempts");
+        setRemaining(0);
+      } else {
+        setRemaining(secondsLeft);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [lockedUntil]);
+
+  const registerFailedAttempt = () => {
+    const attempts = Number(localStorage.getItem("failedAttempts") || 0) + 1;
+    localStorage.setItem("failedAttempts", attempts);
+
+    if (attempts >= 3) {
+      const until = Date.now() + 15 * 60 * 1000;
+      localStorage.setItem("loginLockedUntil", until);
+      setLockedUntil(until);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (lockedUntil && lockedUntil > Date.now()) {
+      setError("Too many failed attempts. Please try again later.");
+      return;
+    }
 
     try {
       const userCredential = await signInWithEmailAndPassword(
@@ -34,16 +78,24 @@ function Login() {
 
       const adminDoc = await getDoc(doc(db, "admins", user.uid));
 
-      if (adminDoc.exists()) {
+      if (adminDoc.exists() && adminDoc.data().role === "admin") {
+        localStorage.removeItem("failedAttempts");
+        localStorage.removeItem("loginLockedUntil");
         navigate("/dashboard");
       } else {
         await signOut(auth);
-        setError("Access denied. Only admin can login.");
+        registerFailedAttempt();
+        setError("Access denied. Not an admin account.");
       }
     } catch (err) {
-      setError("Login failed: " + err.message);
+      registerFailedAttempt();
+      setError("Invalid email or password.");
     }
   };
+
+  const minutes = Math.floor(remaining / 60);
+  const seconds = remaining % 60;
+  const isLocked = lockedUntil && lockedUntil > Date.now();
 
   return (
     <div className="login-container">
@@ -60,6 +112,12 @@ function Login() {
 
         {error && <p className="login-error">⚠️ {error}</p>}
 
+        {isLocked && (
+          <p className="login-error">
+            🔒 Locked. Try again in {minutes}:{seconds.toString().padStart(2, "0")}
+          </p>
+        )}
+
         <form onSubmit={handleLogin}>
           <div className="input-group">
             <label>📧 Email Address</label>
@@ -69,6 +127,7 @@ function Login() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLocked}
               required
             />
           </div>
@@ -82,6 +141,7 @@ function Login() {
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLocked}
                 required
               />
 
@@ -95,7 +155,7 @@ function Login() {
             </div>
           </div>
 
-          <button type="submit" className="login-button">
+          <button type="submit" className="login-button" disabled={isLocked}>
             🔐 Login
           </button>
         </form>

@@ -12,57 +12,77 @@ function Players() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "Users"),
-      (snapshot) => {
-        const data = snapshot.docs.map((doc) => {
-          const user = doc.data();
+    let usersA = [];
+    let usersB = [];
+    let scores = [];
 
-          return {
-            id: doc.id,
+    const buildPlayers = () => {
+      const merged = [...usersA, ...usersB];
+      const uniqueUsers = new Map();
 
-            username:
-              user.username ||
-              user.Username ||
-              user.name ||
-              "Unknown",
+      merged.forEach((user) => {
+        const key = user.email ? user.email.trim().toLowerCase() : user.id;
+        uniqueUsers.set(key, user);
+      });
 
-            email:
-              user.email ||
-              user.Email ||
-              "No email",
+      const latestScoreById = new Map();
 
-            score:
-              user.totalscores ||
-              user.totalScore ||
-              user.Totalscore ||
-              user.score ||
-              0,
+      scores.forEach((entry) => {
+        if (!entry.userId) return;
 
-            level:
-              user.currentLevel ||
-              user.Currentlevel ||
-              user["current level"] ||
-              user.level ||
-              0,
+        const existing = latestScoreById.get(entry.userId);
+        const time = entry.timestamp ? entry.timestamp.toDate().getTime() : 0;
+        const existingTime = existing?.timestamp
+          ? existing.timestamp.toDate().getTime()
+          : -1;
 
-            coins:
-              user.coins ||
-              user.Coins ||
-              0,
-          };
-        });
+        if (!existing || time > existingTime) {
+          latestScoreById.set(entry.userId, entry);
+        }
+      });
 
-        setPlayers(data);
-        setLoading(false);
-      },
-      (error) => {
-        console.log("Error:", error);
-        setLoading(false);
-      }
-    );
+      const data = Array.from(uniqueUsers.values()).map((user) => {
+        const score = latestScoreById.get(user.id);
 
-    return () => unsubscribe();
+        const lastActive = score?.timestamp
+          ? score.timestamp.toDate().toLocaleString()
+          : "Never";
+
+        return {
+          id: user.id,
+          username: user.username || user.name || "Unknown",
+          email: user.email || "No email",
+          coins: user.coins || 0,
+          score: score ? score.score : user.totalScore || 0,
+          level: score ? score.level : user.currentLevel || 0,
+          lastActive,
+        };
+      });
+
+      setPlayers(data);
+      setLoading(false);
+    };
+
+    const unsubA = onSnapshot(collection(db, "Users"), (snap) => {
+      usersA = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      buildPlayers();
+    });
+
+    const unsubB = onSnapshot(collection(db, "users"), (snap) => {
+      usersB = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      buildPlayers();
+    });
+
+    const unsubScores = onSnapshot(collection(db, "scores"), (snap) => {
+      scores = snap.docs.map((d) => d.data());
+      buildPlayers();
+    });
+
+    return () => {
+      unsubA();
+      unsubB();
+      unsubScores();
+    };
   }, []);
 
   const filteredPlayers = players.filter((player) =>
@@ -112,6 +132,7 @@ function Players() {
                     <th>Score</th>
                     <th>Level</th>
                     <th>Coins</th>
+                    <th>Last Active</th>
                   </tr>
                 </thead>
 
@@ -123,13 +144,14 @@ function Players() {
                       <td>{player.score}</td>
                       <td>Level {player.level}</td>
                       <td>🪙 {player.coins}</td>
+                      <td>{player.lastActive}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
 
               {filteredPlayers.length === 0 && (
-                <p className="message">No players found.</p>
+                <p className="message">No player data available yet.</p>
               )}
             </div>
           )}

@@ -84,6 +84,16 @@ td {
   color: #666;
 }
 
+.edit-btn {
+  border: 0;
+  background: #eaf3ff;
+  color: #2563eb;
+  padding: 7px 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
 .delete-btn {
   border: 0;
   background: #fff0f0;
@@ -104,35 +114,44 @@ td {
 
 @media (max-width: 700px) {
   .page-content {
-    padding: 70px 15px 25px;
+    padding: 75px 15px 25px;
   }
 
   .page-heading h1 {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   .section-head {
     display: block;
-    padding: 15px;
+    padding: 16px;
   }
 
   .section-head h2 {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 
   .add-area {
     display: flex;
     flex-direction: column;
+    gap: 10px;
   }
 
   .add-area input,
   .add-area button {
     width: 100%;
+    padding: 12px;
   }
 
   th,
   td {
     padding: 12px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    padding: 8px 10px;
     font-size: 13px;
   }
 }
