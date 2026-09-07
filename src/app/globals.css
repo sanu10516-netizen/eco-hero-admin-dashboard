@@ -1,0 +1,326 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Eco Hero operations console
+
+   The game is bright: daylight, meadow green, open sky. The console used to
+   be near black, which made it feel like a different product entirely. It now
+   runs in daylight too, with saturated accents borrowed straight from the
+   game's own palette and heavy rounded surfaces that read as game furniture
+   rather than as a spreadsheet.
+   ------------------------------------------------------------------ */
+
+@theme {
+  /* Ground and raised surfaces */
+  --color-base: #e7f2dd; /* meadow light, the page itself */
+  --color-base-deep: #d8ead0; /* sunk wells and track grooves */
+  --color-surface: #ffffff; /* cards */
+  --color-surface-high: #f3faec; /* hover and raised nesting */
+  --color-surface-hover: #e9f5de;
+
+  /* Hairlines. Green black at low alpha, so they sit in the palette rather
+     than greying everything they touch. */
+  --color-line: rgba(20, 48, 28, 0.1);
+  --color-line-strong: rgba(20, 48, 28, 0.2);
+
+  /* Accents, all straight from the game */
+  --color-canopy: #2fa84f; /* leaf */
+  --color-canopy-deep: #1d7c38;
+  --color-canopy-soft: #d5f0dc;
+
+  --color-tide: #1c9ce0; /* sky and water */
+  --color-tide-deep: #0d74ad;
+  --color-tide-soft: #d3ecfa;
+
+  --color-sun: #f5b323; /* stars, coins, rewards */
+  --color-sun-deep: #cc8f0c;
+  --color-sun-soft: #fdefcd;
+
+  --color-amber: #e0930f;
+
+  --color-coral: #f0603c; /* litter, warnings, bans */
+  --color-coral-deep: #c33f1e;
+  --color-coral-soft: #fddcd4;
+  --color-rust: #e0492c;
+
+  --color-berry: #7c5cf0; /* research and survey data */
+  --color-berry-soft: #e4dcfd;
+
+  /* Type */
+  --color-ink: #14301c; /* deep forest, near black but never grey */
+  --color-ink-soft: #4b6753;
+  --color-ink-faint: #7b9484;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fredoka), var(--font-inter), ui-rounded, sans-serif;
+  --font-mono: var(--font-jet), ui-monospace, "SF Mono", monospace;
+
+  /* One easing everywhere. Motion that shares a curve reads as one system. */
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+
+html {
+  background-color: #e7f2dd;
+  color-scheme: light;
+}
+
+body {
+  background-color: transparent; /* the world backdrop paints the ground */
+  color: #14301c;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Lenis drives scrolling, so native smooth behaviour is disabled to stop
+   the two fighting each other. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+::selection {
+  background: rgba(47, 168, 79, 0.24);
+  color: #14301c;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #d8ead0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a9c9ac;
+  border-radius: 999px;
+  border: 3px solid #d8ead0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8ab591;
+}
+
+:focus-visible {
+  outline: 2px solid #2fa84f;
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------
+   Surface treatment
+
+   Cards carry a soft green shadow rather than a grey one. A neutral shadow
+   on a green page reads as dirt; a tinted one reads as light.
+   ------------------------------------------------------------------ */
+
+.card-lift {
+  box-shadow:
+    0 1px 2px rgba(20, 48, 28, 0.05),
+    0 8px 22px -12px rgba(20, 48, 28, 0.18);
+  transition:
+    transform 0.45s var(--ease-out-soft),
+    box-shadow 0.45s var(--ease-out-soft);
+}
+
+.card-lift:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 1px 2px rgba(20, 48, 28, 0.06),
+    0 20px 38px -18px rgba(20, 48, 28, 0.26);
+}
+
+/* Buttons and tiles press in, the way game UI does. */
+.press {
+  transition:
+    transform 0.18s var(--ease-spring),
+    background-color 0.3s var(--ease-out-soft),
+    box-shadow 0.3s var(--ease-out-soft);
+}
+
+.press:active {
+  transform: translateY(1px) scale(0.985);
+}
+
+/* ------------------------------------------------------------------
+   Motion primitives
+   ------------------------------------------------------------------ */
+
+@keyframes drift {
+  0% {
+    background-position: -180% 0;
+  }
+  100% {
+    background-position: 180% 0;
+  }
+}
+
+/* Loading placeholder. A slow pass of light across a tinted block, so a page
+   full of them shimmers in sequence instead of flashing in unison. */
+.skeleton {
+  background-color: rgba(20, 48, 28, 0.06);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 180% 100%;
+  background-repeat: no-repeat;
+  animation: drift 1.9s var(--ease-out-soft) infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}
+
+.live-dot {
+  animation: breathe 2.4s var(--ease-out-soft) infinite;
+}
+
+/* A ring that pulses outward from the live indicator. */
+@keyframes ripple {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+
+.live-ripple {
+  animation: ripple 2.4s var(--ease-out-soft) infinite;
+}
+
+/* Seeds carried up the page by the ambient layer. */
+@keyframes drift-up {
+  0% {
+    transform: translateY(105vh) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-12vh) translateX(46px) rotate(220deg);
+    opacity: 0;
+  }
+}
+
+.drift-seed {
+  bottom: 0;
+  animation-name: drift-up;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Bars fill from nothing on first paint. Width is set inline; this only
+   animates the growth so a chart never snaps into place. */
+@keyframes grow-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.grow-bar {
+  transform-origin: left center;
+  animation: grow-bar 0.9s var(--ease-out-soft) both;
+}
+
+/* Line charts draw themselves in rather than appearing whole. */
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: var(--draw-length);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.draw-line {
+  stroke-dasharray: var(--draw-length);
+  animation: draw-line 1.5s var(--ease-out-soft) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: rise 0.6s var(--ease-out-soft) both;
+}
+
+/* Sun and cloud movement in the backdrop, kept in CSS so it costs nothing. */
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+/* Reveal items are deliberately NOT hidden here.
+   They used to start at opacity 0 and wait for GSAP to bring them in, which
+   meant any panel that mounted after its data arrived stayed invisible forever
+   and the container rendered as an empty box. Content now defaults to visible
+   and GSAP fades it in from nothing; if the animation never runs, the worst
+   case is a missing flourish rather than missing data. */
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .live-dot,
+  .live-ripple,
+  .drift-seed,
+  .grow-bar,
+  .draw-line,
+  .rise,
+  .float-slow {
+    animation: none;
+  }
+
+  .drift-seed {
+    opacity: 0;
+  }
+
+  .draw-line {
+    stroke-dasharray: none;
+  }
+
+  .card-lift:hover {
+    transform: none;
+  }
+}
