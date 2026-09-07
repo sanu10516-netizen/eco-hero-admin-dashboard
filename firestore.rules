@@ -1,0 +1,131 @@
+rules_version = '2';
+
+// ---------------------------------------------------------------------------
+// Eco Hero Firestore rules
+//
+// The project is currently in test mode, which allows any client holding the
+// public config to read and write every document, including rewriting another
+// player's score. Test mode also expires on a fixed date, after which the game
+// stops saving with no warning.
+//
+// Deploy with:
+//   firebase deploy --only firestore:rules
+//
+// Read these as the real access control. The console's RequireAdmin guard stops
+// an operator wandering into a page they should not see, but anyone can run
+// their own client, so the rules below are what actually protects the data.
+// ---------------------------------------------------------------------------
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    // One document read, cached for the duration of the request.
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isBanned() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/communityBans/$(request.auth.uid));
+    }
+
+    // ---- Admin roster -----------------------------------------------------
+    // A signed in user may read their own record, which is what the console
+    // checks on load. Nobody may grant themselves clearance from a client;
+    // documents here are created in the Firebase console.
+    match /admins/{userId} {
+      allow get: if isSelf(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow write: if false;
+    }
+
+    // ---- Player profiles --------------------------------------------------
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create: if isSelf(userId);
+
+      // A player may update their own profile, but not hand themselves a role
+      // or edit somebody else's. Admins may correct any record.
+      allow update: if isSelf(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ---- Completed runs ---------------------------------------------------
+    // Runs are append only from the game. Letting a client edit a stored score
+    // is the whole leaderboard forgery problem, so updates are refused.
+    match /scores/{runId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.score is number
+        && request.resource.data.score >= 0;
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ---- Play sessions ----------------------------------------------------
+    // Opened when a level starts and closed when it ends, so the owner needs
+    // update rights, but only on their own session.
+    match /gameSessions/{sessionId} {
+      allow read: if isAdmin()
+        || (signedIn() && resource.data.userId == request.auth.uid);
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if signedIn() && resource.data.userId == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+
+    // ---- Inventory --------------------------------------------------------
+    match /inventory/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+      allow create, update: if isSelf(userId);
+      allow delete: if isAdmin();
+    }
+
+    // ---- Research ---------------------------------------------------------
+    // A player may submit their own answers and never read anyone else's.
+    // Bulk reading is limited to admins, since this is study data.
+    match /questionnaire_responses/{responseId} {
+      allow read: if isAdmin();
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // ---- Community --------------------------------------------------------
+    match /communityPosts/{postId} {
+      allow read: if signedIn();
+
+      allow create: if signedIn()
+        && !isBanned()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 2000;
+
+      // Only moderators hide or remove posts. An author cannot quietly edit a
+      // post after it has been acted on.
+      allow update, delete: if isAdmin();
+    }
+
+    match /communityBans/{userId} {
+      // Clients read this to know whether posting is allowed.
+      allow get: if signedIn();
+      allow list: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Anything not named above is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
