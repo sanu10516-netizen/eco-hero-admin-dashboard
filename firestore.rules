@@ -111,9 +111,12 @@ service cloud.firestore {
         && request.resource.data.body.size() > 0
         && request.resource.data.body.size() <= 2000;
 
-      // Only moderators hide or remove posts. An author cannot quietly edit a
-      // post after it has been acted on.
-      allow update, delete: if isAdmin();
+      // Only moderators hide or edit a post's fields - an author cannot
+      // quietly rewrite one after it has been acted on. Deleting outright is
+      // different: the author of a post may always take it down themselves,
+      // same as a moderator can.
+      allow update: if isAdmin();
+      allow delete: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
     }
 
     match /communityBans/{userId} {
