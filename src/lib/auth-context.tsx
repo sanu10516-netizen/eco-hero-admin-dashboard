@@ -72,11 +72,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setAdmin({ uid: next.uid, ...snap.data() } as AdminProfile);
           setClearance("granted");
         } else {
-          // Signed in, but not staff. Drop the session rather than leaving a
-          // half authenticated user sitting on the login screen.
+          // Signed in, but not staff. Deny clearance without touching the
+          // session itself.
+          //
+          // Firebase Auth is one identity per browser, not one per tab or
+          // route: signing out here used to end the session for every open
+          // tab on this origin, including a player who had just signed in on
+          // /community in a different tab. Denying clearance already keeps
+          // this console's own UI and its Firestore rules closed to a
+          // non-admin; it does not also need to log everyone else out.
           setAdmin(null);
           setClearance("denied");
-          await signOut(auth);
         }
       } catch {
         // A rules rejection or a dropped connection lands here. Fail closed.
@@ -93,7 +99,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const snap = await getDoc(doc(db, COLLECTIONS.admins, credential.user.uid));
 
     if (!snap.exists() || snap.data()?.role !== "admin") {
-      await signOut(auth);
+      // Same reasoning as the listener: these credentials might belong to a
+      // real player with a session open elsewhere, so the failure here is
+      // reported without signing that identity out of the browser.
       throw new NotAnAdminError();
     }
     // The listener above promotes clearance to "granted".

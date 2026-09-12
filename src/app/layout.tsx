@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Fredoka, Inter, JetBrains_Mono } from "next/font/google";
 
 import "./globals.css";
-import { AuthProvider } from "@/lib/auth-context";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { WorldBackdrop } from "@/components/world-backdrop";
 
@@ -54,7 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full font-sans antialiased">
         <WorldBackdrop />
         <SmoothScroll />
-        <AuthProvider>{children}</AuthProvider>
+        {children}
       </body>
     </html>
   );
