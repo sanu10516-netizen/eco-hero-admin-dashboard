@@ -1,12 +1,3 @@
-/**
- * CSV writer for research exports.
- *
- * Values are quoted whenever they contain a delimiter, a quote or a newline,
- * and embedded quotes are doubled, which is what RFC 4180 asks for. A leading
- * =, +, - or @ is prefixed with a single quote so a spreadsheet treats the cell
- * as text rather than a formula.
- */
-
 export interface Column<T> {
   header: string;
   value: (row: T) => string | number | null | undefined;
@@ -30,7 +21,6 @@ export function toCsv<T>(rows: T[], columns: Column<T>[]): string {
     columns.map((column) => escapeCell(column.value(row))).join(","),
   );
 
-  // Excel needs a BOM to read UTF-8 correctly, otherwise accented names break.
   return `﻿${[header, ...body].join("\r\n")}`;
 }
 
@@ -45,7 +35,6 @@ export function downloadCsv(filename: string, contents: string): void {
   link.click();
   link.remove();
 
-  // Give the browser a moment to start the download before revoking.
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 

@@ -47,13 +47,6 @@ export default function ResearchPage() {
       );
   }, [data, mission, search]);
 
-  /**
-   * Counts per distinct answer, per question.
-   *
-   * Answers are grouped exactly as the game recorded them. Nothing is bucketed
-   * or renamed, because collapsing two spellings into one option would change
-   * the result being reported.
-   */
   const distributions = useMemo(() => {
     return RESEARCH_QUESTIONS.map(({ key, prompt }) => {
       const counts = new Map<string, number>();
@@ -118,7 +111,6 @@ export default function ResearchPage() {
         }
       />
 
-      {/* Aggregates */}
       <section className="reveal-item">
         {loading ? (
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -140,7 +132,6 @@ export default function ResearchPage() {
         )}
       </section>
 
-      {/* Responses */}
       <Panel className="reveal-item overflow-hidden">
         <PanelHeader
           title="Individual responses"

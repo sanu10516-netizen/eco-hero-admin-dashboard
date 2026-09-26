@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 
 type Tone = "canopy" | "tide" | "sun" | "coral" | "berry" | "neutral";
 
-/** Icon chip colours. Kept in one place so a tone means the same thing everywhere. */
 export const TONE_CHIP: Record<Tone, string> = {
   canopy: "bg-canopy-soft text-canopy-deep",
   tide: "bg-tide-soft text-tide-deep",
@@ -13,13 +12,6 @@ export const TONE_CHIP: Record<Tone, string> = {
   neutral: "bg-surface-high text-ink-soft",
 };
 
-/**
- * Raised container.
- *
- * Deep corners and a green tinted shadow, so a card reads as a physical tile
- * the way the game's own panels do. A neutral shadow on a green page looks like
- * dirt; a tinted one looks like light.
- */
 export function Panel({
   children,
   className = "",
@@ -27,7 +19,6 @@ export function Panel({
 }: {
   children: ReactNode;
   className?: string;
-  /** Turn off for panels holding their own hover behaviour, such as tables. */
   lift?: boolean;
 }) {
   const resting =
@@ -81,13 +72,6 @@ export function PanelHeader({
   );
 }
 
-/**
- * Page title block, used once at the top of every route.
- *
- * Set in the display face at a size that would be shouting in an ordinary admin
- * tool. That is the point. This console sits behind a children's game, and a
- * timid heading made it feel like something else entirely.
- */
 export function PageHeading({
   title,
   detail,
@@ -112,8 +96,6 @@ export function PageHeading({
           {title}
         </h1>
 
-        {/* Capped by character count rather than a fixed width, so the line
-            length stays readable at any container size. */}
         <p className="mt-2 max-w-[68ch] text-[14px] leading-relaxed text-ink-soft">{detail}</p>
       </div>
 
@@ -122,7 +104,6 @@ export function PageHeading({
   );
 }
 
-/** Pill used for counts, statuses and inline labels. */
 export function Chip({
   children,
   tone = "neutral",

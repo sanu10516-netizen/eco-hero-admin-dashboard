@@ -30,20 +30,12 @@ interface Detail {
   sessions: Session[];
 }
 
-/** Stamped with the player it belongs to, so staleness is detectable. */
 interface Record {
   uid: string;
   detail: Detail | null;
   error: unknown;
 }
 
-/**
- * Slide out record for one player.
- *
- * The joins are done here, on demand, for a single userId. Loading every score
- * and session up front just to show one player's history would be the same
- * mistake the roster page avoids.
- */
 export function PlayerDrawer({
   player,
   onClose,
@@ -55,8 +47,6 @@ export function PlayerDrawer({
 
   const uid = player?.uid ?? null;
 
-  // Derived rather than assigned at the top of the effect. Writing state
-  // synchronously inside an effect body triggers a cascading render.
   const fresh = Boolean(uid) && record?.uid === uid;
   const loading = Boolean(uid) && !fresh;
   const detail = fresh ? record?.detail ?? null : null;
@@ -112,7 +102,6 @@ export function PlayerDrawer({
     };
   }, [player]);
 
-  // Escape closes, and the page behind stops scrolling while it is open.
   useEffect(() => {
     if (!player) return;
 
@@ -172,8 +161,6 @@ export function PlayerDrawer({
             </header>
 
             <div className="flex-1 overflow-y-auto">
-              {/* Headline figures come from the player document itself, so they
-                  render immediately while the joins are still in flight. */}
               <div className="grid grid-cols-3 gap-px border-b border-line bg-line">
                 <Figure label="Total score" value={formatNumber(player.totalScore)} />
                 <Figure label="Level" value={formatNumber(player.currentLevel)} />

@@ -14,17 +14,13 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <RequireAdmin>
-      {/* No background of its own, so the world layer shows through the gaps
-          between panels rather than being covered by a flat fill. */}
       <div className="flex min-h-screen">
-        {/* Fixed rail from large screens up */}
         <aside className="hidden w-[252px] shrink-0 lg:block xl:w-[268px]">
           <div className="fixed inset-y-0 left-0 w-[252px] xl:w-[268px]">
             <Sidebar />
           </div>
         </aside>
 
-        {/* Drawer below that */}
         <AnimatePresence>
           {menuOpen ? (
             <>
@@ -65,8 +61,6 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <Topbar onOpenMenu={() => setMenuOpen(true)} />
 
           <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 xl:px-10">
-            {/* Wide enough to use a large monitor without letting table rows
-                stretch to an unreadable line length. */}
             <div className="mx-auto w-full max-w-[1680px]">
               <PageTransition>{children}</PageTransition>
             </div>

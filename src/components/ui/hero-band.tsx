@@ -10,17 +10,6 @@ export interface HeroStat {
   format?: (input: number) => string;
 }
 
-/**
- * The banner at the top of the operations page.
- *
- * The console had no moment anywhere in it that said what game this belongs to.
- * This is that moment: the game's own daylight palette, its horizon, and the
- * three figures that matter most, counted up as they land.
- *
- * The scene is decorative and marked as such. Every figure it sits beside is
- * real, and each one is repeated in the tiles below, so nothing here is the
- * only place a number appears.
- */
 export function HeroBand({
   eyebrow,
   title,
@@ -83,7 +72,6 @@ export function HeroBand({
   );
 }
 
-/** Sun, hills and a tree line, drawn into the banner rather than layered over it. */
 function Scenery() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">

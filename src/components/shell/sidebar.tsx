@@ -15,11 +15,6 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import { initialsFrom } from "@/lib/format";
 
-/**
- * Each route carries its own colour, and it is the same colour used by that
- * page's headline panels. Colour becomes a wayfinding cue rather than
- * decoration, so you know which section you are in before you read the title.
- */
 const NAV = [
   {
     href: "/dashboard",
@@ -69,7 +64,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <div className="flex h-full flex-col border-r border-line bg-surface">
-      {/* Identity */}
       <div className="flex items-center gap-3 px-5 py-5">
         <Mark />
 
@@ -81,7 +75,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         </div>
       </div>
 
-      {/* Routes */}
       <nav className="flex-1 overflow-y-auto px-3 pb-4">
         <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-faint">
           Monitoring
@@ -105,9 +98,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                     current ? "text-ink" : "text-ink-soft hover:bg-surface-high hover:text-ink",
                   ].join(" ")}
                 >
-                  {/* The filled pill is one shared element that slides between
-                      routes, rather than one fading out while another fades in.
-                      It makes the navigation feel like a single moving part. */}
                   {current ? (
                     <motion.span
                       layoutId="nav-active"
@@ -141,7 +131,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         </ul>
       </nav>
 
-      {/* Signed in account */}
       <div className="border-t border-line p-3">
         <div className="flex items-center gap-3 rounded-xl bg-surface-high px-3 py-2.5">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-canopy text-[12px] font-semibold text-white">
@@ -169,7 +158,6 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-/** Drawn rather than imported, so the identity is not a stock glyph. */
 function Mark() {
   return (
     <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-canopy shadow-[0_6px_14px_-6px_rgba(47,168,79,0.9)]">

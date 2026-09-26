@@ -3,10 +3,6 @@
 import { Sprout, TriangleAlert } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 
-/* ------------------------------------------------------------------ */
-/* Loading                                                             */
-/* ------------------------------------------------------------------ */
-
 export function Skeleton({
   className = "",
   style,
@@ -17,13 +13,6 @@ export function Skeleton({
   return <div className={`skeleton rounded-lg ${className}`} style={style} />;
 }
 
-/**
- * Placeholders are shaped like the thing they stand in for.
- *
- * A generic grey box tells the reader nothing and makes the layout jump when
- * the real content lands. Matching the final shape means the page is already
- * built by the time the data arrives, and only the ink changes.
- */
 export function SkeletonTable({
   rows = 6,
   columns = 5,
@@ -42,7 +31,6 @@ export function SkeletonTable({
               key={cellIndex}
               className="h-3.5"
               style={{
-                // First column carries the name, so it reads wider.
                 width: cellIndex === 0 ? "22%" : `${9 + ((rowIndex + cellIndex) % 4) * 3}%`,
                 animationDelay: `${rowIndex * 70}ms`,
               }}
@@ -77,7 +65,6 @@ export function SkeletonMetrics({ count = 4 }: { count?: number }) {
   );
 }
 
-/** Stands in for a line chart: rising columns where the trend will be. */
 export function SkeletonChart({ height = 168 }: { height?: number }) {
   const heights = [38, 54, 46, 68, 58, 78, 64, 88, 72, 96, 84, 100, 90, 76];
 
@@ -94,7 +81,6 @@ export function SkeletonChart({ height = 168 }: { height?: number }) {
   );
 }
 
-/** Stands in for a bar list: a label line above a track, repeated. */
 export function SkeletonBars({ rows = 4 }: { rows?: number }) {
   return (
     <div className="space-y-5 px-5 py-5">
@@ -115,7 +101,6 @@ export function SkeletonBars({ rows = 4 }: { rows?: number }) {
   );
 }
 
-/** Stands in for a ranked list: rank chip, avatar, name, score. */
 export function SkeletonList({ rows = 6 }: { rows?: number }) {
   return (
     <div className="divide-y divide-line">
@@ -139,13 +124,6 @@ export function SkeletonList({ rows = 6 }: { rows?: number }) {
   );
 }
 
-/**
- * Whole page placeholder, used by the route level loading files.
- *
- * Next renders this the instant a navigation starts, so moving between routes
- * never leaves the reader on the previous page wondering whether the click
- * registered.
- */
 export function SkeletonPage({ panels = 2 }: { panels?: number }) {
   return (
     <div className="space-y-6">
@@ -178,18 +156,6 @@ export function SkeletonPage({ panels = 2 }: { panels?: number }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Empty                                                               */
-/* ------------------------------------------------------------------ */
-
-/**
- * Names the collection that came back with nothing.
- *
- * The previous console read several collections the game never writes and
- * simply rendered blank pages, so nobody could tell a wiring mistake from a
- * genuinely quiet database. Saying which path was queried makes that obvious
- * in one glance.
- */
 export function EmptyState({
   collection,
   title,
@@ -203,8 +169,6 @@ export function EmptyState({
 }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-line bg-surface">
-      {/* Bare ground waiting to be planted. It says nothing is here yet without
-          resorting to a shrug or an apology. */}
       <div
         aria-hidden
         className="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,transparent,rgba(47,168,79,0.09))]"
@@ -232,15 +196,6 @@ export function EmptyState({
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Error                                                               */
-/* ------------------------------------------------------------------ */
-
-/**
- * Surfaces the raw Firestore response. A blocked read almost always means the
- * security rules are doing their job, and the code tells you which rule to look
- * at, so it is worth showing rather than swallowing.
- */
 export function ErrorState({
   title = "The database refused this request",
   error,

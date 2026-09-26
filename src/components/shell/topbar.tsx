@@ -5,7 +5,6 @@ import { Menu } from "lucide-react";
 
 import { useConnection } from "@/lib/use-connection";
 
-/** Titles mirror the sidebar, so the strip always says where you are. */
 const TITLES: { href: string; label: string; exact?: boolean }[] = [
   { href: "/dashboard", label: "Operations", exact: true },
   { href: "/dashboard/players", label: "Players" },
@@ -14,13 +13,6 @@ const TITLES: { href: string; label: string; exact?: boolean }[] = [
   { href: "/dashboard/community", label: "Community" },
 ];
 
-/**
- * Thin context strip.
- *
- * It carries the mobile menu trigger, the current section, and a live indicator
- * driven by the real Firestore listener state rather than a decorative dot that
- * is always green.
- */
 export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const status = useConnection();
   const pathname = usePathname();

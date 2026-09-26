@@ -3,17 +3,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
-/**
- * The restoration cycle, drawn as it happens in the game.
- *
- * Litter is cleared, grass returns to the bare ground, then a sapling grows and
- * fills out. The sequence loops slowly with a long pause on the finished state,
- * so it reads as a quiet illustration rather than something demanding attention
- * next to a sign in form.
- *
- * Everything is one inline SVG driven by a single GSAP timeline. No sprite
- * sheet, no video, and nothing that keeps painting once the tab is hidden.
- */
 export function RestorationScene({ className = "" }: { className?: string }) {
   const root = useRef<SVGSVGElement | null>(null);
   const timeline = useRef<gsap.core.Timeline | null>(null);
@@ -33,8 +22,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduced) {
-      // Show the restored state and stop. The point of the illustration is the
-      // outcome, which a still frame carries perfectly well.
       gsap.set(litter, { opacity: 0 });
       gsap.set(blades, { scaleY: 1, opacity: 1 });
       gsap.set(canopy, { scale: 1, opacity: 1 });
@@ -56,7 +43,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
     const tl = gsap.timeline({ repeat: -1, defaults: { ease: "power3.out" } });
     timeline.current = tl;
 
-    // 1. The ground is cleared. Each piece lifts away rather than blinking out.
     tl.to(litter, {
       y: -26,
       rotate: (index: number) => (index % 2 ? 34 : -28),
@@ -65,7 +51,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
       stagger: 0.13,
     });
 
-    // 2. Grass returns across the cleared ground.
     tl.to(
       blades,
       {
@@ -78,12 +63,10 @@ export function RestorationScene({ className = "" }: { className?: string }) {
       "-=0.35",
     );
 
-    // 3. A sapling draws itself upward.
     if (trunk) {
       tl.to(trunk, { strokeDashoffset: 0, duration: 1.25, ease: "power2.inOut" }, "-=0.5");
     }
 
-    // 4. The canopy fills in, lowest leaves first.
     tl.to(
       canopy,
       {
@@ -96,7 +79,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
       "-=0.45",
     );
 
-    // 5. Seeds drift off the finished tree, then the cycle resets.
     tl.to(
       motes,
       {
@@ -116,7 +98,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
     tl.to(trunk, { opacity: 0, duration: 0.6 }, "<");
     tl.to(motes, { opacity: 0, duration: 0.4 }, "<");
 
-    // Restore the starting frame off screen so the loop does not visibly snap.
     tl.set([blades], { scaleY: 0, opacity: 0 });
     tl.set(canopy, { scale: 0, opacity: 0 });
     tl.set(trunk, { strokeDashoffset: length, opacity: 1 });
@@ -124,7 +105,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
     tl.set(litter, { opacity: 1, y: 0, rotate: 0 });
     tl.to({}, { duration: 0.5 });
 
-    // Pausing when the tab is hidden keeps a background tab from animating.
     const onVisibility = () => {
       if (document.hidden) tl.pause();
       else tl.resume();
@@ -138,7 +118,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
     };
   }, []);
 
-  // Grass placed by hand rather than evenly, so the line does not look printed.
   const grass = [
     { x: 66, h: 20, lean: -5 },
     { x: 84, h: 27, lean: 3 },
@@ -162,7 +141,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
       role="img"
       aria-label="Litter is cleared from bare ground, grass returns and a tree grows"
     >
-      {/* Ground */}
       <line
         x1="40"
         y1="230"
@@ -172,7 +150,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
         strokeWidth="1"
       />
 
-      {/* A little soil texture so the line is not the only anchor */}
       {[58, 96, 148, 205, 262, 318, 344].map((x, index) => (
         <line
           key={x}
@@ -185,7 +162,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
         />
       ))}
 
-      {/* Litter, cleared in the first beat */}
       <g stroke="#c33f1e" strokeWidth="2.5" fill="#f0603c" fillOpacity="0.75" strokeLinejoin="round">
         <path data-litter d="M92 230 l7 -9 l10 3 l-3 6 z" />
         <path data-litter d="M147 230 l5 -7 l9 1 l-2 6 z" />
@@ -194,7 +170,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
         <circle data-litter cx="330" cy="225" r="4.5" />
       </g>
 
-      {/* Grass */}
       <g stroke="#2fa84f" strokeWidth="3" fill="none" strokeLinecap="round">
         {grass.map((blade) => (
           <path
@@ -207,7 +182,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
         ))}
       </g>
 
-      {/* Trunk and branches, drawn on */}
       <path
         data-trunk
         d="M200 230 L200 168 M200 196 L182 178 M200 184 L219 165"
@@ -217,7 +191,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
         strokeLinecap="round"
       />
 
-      {/* Canopy */}
       <g fill="none" strokeLinejoin="round">
         <path
           data-canopy
@@ -237,7 +210,6 @@ export function RestorationScene({ className = "" }: { className?: string }) {
         <circle data-canopy cx="200" cy="146" r="12" fill="rgba(255,255,255,0.32)" stroke="none" />
       </g>
 
-      {/* Seeds drifting from the finished tree */}
       <g fill="#2fa84f">
         <circle data-mote cx="176" cy="132" r="2.6" />
         <circle data-mote cx="223" cy="140" r="2.2" />

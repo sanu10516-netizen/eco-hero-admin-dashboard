@@ -52,13 +52,6 @@ export default function CommunityPage() {
       });
   }, [posts.data, filter]);
 
-  /**
-   * Hiding is preferred to deleting.
-   *
-   * A hidden post stays in the record, so a moderation decision can be reviewed
-   * or reversed. Permanent deletion is kept behind a confirmation because there
-   * is no undo once the document is gone.
-   */
   async function setHidden(post: Post, hidden: boolean) {
     setWorking(post.id);
     setActionError(null);
@@ -274,7 +267,6 @@ export default function CommunityPage() {
           )}
         </Panel>
 
-        {/* Banned list, so a ban can be lifted without hunting for a post. */}
         {bans.data.length > 0 ? (
           <Panel className="reveal-item">
             <PanelHeader title="Banned players" detail="Held in the communityBans collection." />
@@ -315,7 +307,6 @@ export default function CommunityPage() {
         </div>
       </Reveal>
 
-      {/* Deletion is irreversible, so it asks first and says what is lost. */}
       <AnimatePresence>
         {pendingDelete ? (
           <>

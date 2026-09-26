@@ -1,11 +1,5 @@
 import { Timestamp } from "firebase/firestore";
 
-/**
- * Firestore hands back a Timestamp, but a document written by an older build,
- * or one still holding a pending server timestamp, can arrive as null, a raw
- * seconds object, or a date string. Everything funnels through here so a single
- * malformed row cannot take a whole page down.
- */
 export function toDate(value: unknown): Date | null {
   if (!value) return null;
 
@@ -50,7 +44,6 @@ export function formatDate(value: unknown): string {
   return date ? DATE_ONLY.format(date) : "No record";
 }
 
-/** Compact relative wording for activity columns. */
 export function formatRelative(value: unknown): string {
   const date = toDate(value);
   if (!date) return "No record";
@@ -72,7 +65,6 @@ export function formatRelative(value: unknown): string {
   return DATE_ONLY.format(date);
 }
 
-/** Duration between two points, written for scanning rather than precision. */
 export function formatDuration(from: unknown, to: unknown): string {
   const start = toDate(from);
   const end = toDate(to);
@@ -96,7 +88,6 @@ export function formatNumber(value: number | undefined | null): string {
   return NUMBER.format(value);
 }
 
-/** Shortens large counts for metric tiles so the type size can stay fixed. */
 export function formatCompact(value: number | undefined | null): string {
   if (typeof value !== "number" || Number.isNaN(value)) return "0";
   if (Math.abs(value) < 10_000) return NUMBER.format(value);
@@ -109,7 +100,6 @@ export function formatPercent(part: number, whole: number): string {
   return `${Math.round((part / whole) * 100)}%`;
 }
 
-/** Short, stable identifier for tables. Full ids are too wide to scan. */
 export function shortId(id: string | undefined | null): string {
   if (!id) return "unknown";
   return id.length <= 10 ? id : `${id.slice(0, 6)}…${id.slice(-4)}`;

@@ -15,29 +15,15 @@ export interface LiveResult<T> {
   data: T[];
   loading: boolean;
   error: unknown;
-  /** True once the first snapshot has arrived, empty or not. */
   settled: boolean;
 }
 
 interface Snapshot<T> {
-  /** Identifies which subscription produced this state. */
   token: string;
   data: T[];
   error: unknown;
 }
 
-/**
- * Realtime read of a collection.
- *
- * Constraints are supplied as a factory plus an explicit key. Building an array
- * inline creates a new reference every render, which would tear down and
- * rebuild the listener each time and quietly multiply the read count. The key
- * is what the subscription actually depends on.
- *
- * The query is assembled inside the effect rather than in a memo, so nothing is
- * read from a ref while rendering, and state carries the token of the
- * subscription that produced it so "loading" can be derived instead of assigned.
- */
 export function useLiveCollection<T extends DocumentData>(
   path: string,
   build?: () => QueryConstraint[],
@@ -51,7 +37,6 @@ export function useLiveCollection<T extends DocumentData>(
     error: null,
   });
 
-  // Written in an effect, read only inside effects, never during render.
   const buildRef = useRef(build);
 
   useEffect(() => {
@@ -73,8 +58,6 @@ export function useLiveCollection<T extends DocumentData>(
         });
       },
       (cause) => {
-        // Surfaced rather than logged. A rules rejection is information the
-        // operator needs, not something to hide behind an empty table.
         setSnapshot({ token, data: [], error: cause });
       },
     );
