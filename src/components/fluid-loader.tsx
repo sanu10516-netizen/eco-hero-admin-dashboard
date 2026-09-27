@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * Quiet activity indicator. A wave travels inside a circle, the way water
- * settles through a filter bed. It does not spin, because a spinner reads as
- * "something is stuck" once it runs for more than a second or two.
- */
 export function FluidLoader({
   size = 44,
   label,
@@ -27,7 +22,6 @@ export function FluidLoader({
           </clipPath>
         </defs>
 
-        {/* Vessel */}
         <circle
           cx="50"
           cy="50"
@@ -38,8 +32,6 @@ export function FluidLoader({
         />
 
         <g clipPath="url(#fluid-bowl)">
-          {/* Two waves at different speeds so the surface never looks like a
-              single rigid shape sliding past. */}
           <path
             d="M-100 56 q 25 -9 50 0 t 50 0 t 50 0 t 50 0 t 50 0 v 60 h -300 z"
             fill="rgba(28,156,224,0.42)"

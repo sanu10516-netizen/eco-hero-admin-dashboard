@@ -12,15 +12,6 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { COLLECTIONS, type BanDoc, type InventoryDoc, type PlayerDoc } from "@/lib/schema";
 
-/**
- * Sign in for an ordinary player, deliberately separate from useAuth.
- *
- * useAuth is wired to the admins collection: it drops any session that is not
- * on the roster, which is correct for the operations console and wrong for
- * everyone the game actually has. This hook asks Firebase for nothing more
- * than a valid account, the same one a player already signed in with inside
- * the game, since it is the same Firebase project underneath.
- */
 export type SessionStatus = "checking" | "signedOut" | "signedIn";
 
 export interface PlayerSession {
@@ -53,9 +44,6 @@ export function usePlayerSession(): PlayerSession {
     });
   }, []);
 
-  // Three small documents, all keyed by uid, all live: a ban applied by a
-  // moderator while this tab is open takes the composer away without a
-  // reload, the same immediacy the rest of the console relies on.
   useEffect(() => {
     if (!user) return;
 

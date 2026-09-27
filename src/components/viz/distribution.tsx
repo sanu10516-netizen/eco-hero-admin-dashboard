@@ -5,17 +5,8 @@ export interface Tally {
   count: number;
 }
 
-/** Cycled so adjacent answers never share a colour. */
 const PALETTE = ["#2fa84f", "#1c9ce0", "#7c5cf0", "#f5b323", "#f0603c"];
 
-/**
- * Proportion bars for one survey question.
- *
- * Bars are drawn against the largest response rather than the total, so a
- * question where the answers are close together still shows a readable
- * difference. The percentage label always reports the share of all responses,
- * which is the figure that belongs in a report.
- */
 export function Distribution({
   prompt,
   tallies,

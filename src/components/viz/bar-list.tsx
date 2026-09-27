@@ -3,10 +3,8 @@
 export type BarAccent = "canopy" | "tide" | "sun" | "coral" | "berry";
 
 export interface BarRow {
-  /** Left hand label, kept short so the bar gets the width. */
   label: string;
   value: number;
-  /** Optional second line under the label. */
   note?: string;
   accent?: BarAccent;
 }
@@ -19,16 +17,6 @@ const TONE: Record<BarAccent, string> = {
   berry: "#7c5cf0",
 };
 
-/**
- * Labelled horizontal bars.
- *
- * Bars are measured against the largest row rather than the total, so a set of
- * similar values still shows a readable difference. The number beside each bar
- * is the real count, so nothing is lost to the visual scaling.
- *
- * Each bar grows out from the left on arrival, staggered down the list, which
- * gives the reader a moment to take in the ordering before the numbers settle.
- */
 export function BarList({
   rows,
   emptyNote = "Nothing recorded yet.",

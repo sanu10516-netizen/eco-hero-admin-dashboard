@@ -7,27 +7,6 @@ export interface SeriesPoint {
   value: number;
 }
 
-/**
- * Single series line chart.
- *
- * Drawn by hand rather than pulled from a chart library. The dataset here is a
- * few dozen points at most, so a library would add far more weight than it
- * removes, and this way the line matches the rest of the interface exactly.
- *
- * The path is a Catmull-Rom spline converted to cubic beziers, which keeps the
- * curve passing through every real reading. Smoothing that misses the actual
- * values would be misleading on a chart people make decisions from.
- *
- * It draws itself in from the left on mount. That is not only decoration: the
- * sweep runs in the direction of time, so the eye arrives at the most recent
- * reading rather than landing somewhere in the middle of the series.
- *
- * The sweep is a CSS animation over a normalised pathLength, not a scripted
- * one. A script driven draw that stalls halfway leaves a chart showing half its
- * readings, which looks like real data and is not. If this animation never runs
- * for any reason, the dash array covers the whole path and the line is simply
- * there, complete, from the first frame.
- */
 export function SparkLine({
   data,
   height = 190,
@@ -62,8 +41,6 @@ export function SparkLine({
       value: point.value,
     }));
 
-    // Catmull-Rom to bezier. Tension of 6 keeps the curve tight enough that a
-    // sharp change still reads as a sharp change.
     let line = `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)}`;
 
     for (let i = 0; i < points.length - 1; i += 1) {
@@ -116,7 +93,6 @@ export function SparkLine({
         </linearGradient>
       </defs>
 
-      {/* Horizontal guides. Deliberately faint; the line is the subject. */}
       {[0.25, 0.5, 0.75].map((ratio) => (
         <line
           key={ratio}
@@ -146,11 +122,6 @@ export function SparkLine({
         vectorEffect="non-scaling-stroke"
       />
 
-      {/* Only the final reading is marked, so the eye lands on the latest value
-          without the line turning into a row of dots.
-          It is drawn from strokes rather than a circle on purpose: the viewBox
-          is stretched to fill the panel, which would squash a circle into an
-          ellipse, while a stroked line with a non-scaling width stays true. */}
       <g>
         <line
           x1={last.x}

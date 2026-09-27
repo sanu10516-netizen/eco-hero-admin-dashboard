@@ -32,7 +32,6 @@ import { CountUp } from "@/components/count-up";
 import { FluidLoader } from "@/components/fluid-loader";
 import { EmptyState, ErrorState, Skeleton } from "@/components/ui/states";
 
-/** Firebase's own codes, translated for a player rather than an operator. */
 function explainSignIn(cause: unknown): string {
   if (cause instanceof FirebaseError) {
     switch (cause.code) {
@@ -126,7 +125,6 @@ function SignInCard({
 
     try {
       await onSignIn(email, password);
-      // onAuthStateChanged in usePlayerSession promotes the view once this resolves.
     } catch (cause) {
       setMessage(explainSignIn(cause));
       setBusy(false);
@@ -226,8 +224,6 @@ function SignInCard({
 function SignedInView({ session }: { session: ReturnType<typeof usePlayerSession> }) {
   const { profile, inventory, ban } = session;
   const username = profile?.username || session.user?.email?.split("@")[0] || "Player";
-  // inventory is the collection the coins/skins drift note names as the
-  // source of truth; users.coins is the fallback for a profile that predates it.
   const coins = inventory?.coins ?? profile?.coins ?? 0;
   const score = profile?.totalScore ?? 0;
   const level = profile?.currentLevel ?? 1;
@@ -373,8 +369,6 @@ function Feed({ uid }: { uid: string }) {
     "createdAt-desc",
   );
 
-  // Hidden posts stay readable to the moderation console on purpose, so a
-  // decision can be reviewed. This is the client that has to leave them out.
   const visible = useMemo(() => posts.data.filter((post) => !post.hidden), [posts.data]);
 
   const [confirmingId, setConfirmingId] = useState<string | null>(null);

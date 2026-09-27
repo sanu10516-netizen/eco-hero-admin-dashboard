@@ -42,9 +42,6 @@ export default function OperationsPage() {
   const loading = players.loading || scores.loading || sessions.loading;
   const failure = players.error ?? scores.error ?? sessions.error;
 
-  // The active window is measured against a clock held in state rather than
-  // read during render. Reading the time while rendering is impure, and it
-  // would also leave the count frozen until some other value changed.
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
@@ -60,9 +57,6 @@ export default function OperationsPage() {
   const stats = useMemo(() => {
     const cutoff = (now ?? 0) - ACTIVE_WINDOW_MINUTES * 60 * 1000;
 
-    // A run counts as in progress when it has no end time and started inside
-    // the window. Without the bound, a run abandoned by closing the app would
-    // stay active forever.
     const active = new Set(
       sessions.data
         .filter((session) => {
@@ -106,7 +100,6 @@ export default function OperationsPage() {
     };
   }, [players.data, scores.data, sessions.data, now]);
 
-  /** Where the player base currently sits, straight from users.currentLevel. */
   const progression = useMemo<BarRow[]>(() => {
     const counts = new Map<number, number>();
 
@@ -125,7 +118,6 @@ export default function OperationsPage() {
       }));
   }, [players.data]);
 
-  /** How well runs are being played, not just how many. */
   const starSpread = useMemo<BarRow[]>(() => {
     const counts = new Map<number, number>();
 
@@ -144,7 +136,6 @@ export default function OperationsPage() {
   }, [scores.data]);
 
   const standings = useMemo<Standing[]>(() => {
-    // Best single run per player, so one strong player cannot fill the board.
     const bestByPlayer = new Map<string, Standing>();
 
     scores.data.forEach((run) => {

@@ -20,13 +20,6 @@ import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { COLLECTIONS, type AdminProfile } from "@/lib/schema";
 
-/**
- * Clearance is deliberately a small state machine rather than a boolean.
- *
- * "checking" is not the same as "denied". Treating them as one is what lets a
- * guard bounce a legitimate admin out during the second or so Firebase spends
- * restoring a saved session.
- */
 export type Clearance = "checking" | "granted" | "denied";
 
 interface AuthValue {
@@ -39,7 +32,6 @@ interface AuthValue {
 
 const AuthContext = createContext<AuthValue | null>(null);
 
-/** Raised when the credentials are valid but the account is not an admin. */
 export class NotAnAdminError extends Error {
   constructor() {
     super("This account exists but has no admin clearance.");
@@ -53,7 +45,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [clearance, setClearance] = useState<Clearance>("checking");
 
   useEffect(() => {
-    // Fires once on load with the restored session, then on every change.
     const stop = onAuthStateChanged(auth, async (next) => {
       if (!next) {
         setUser(null);
@@ -72,20 +63,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setAdmin({ uid: next.uid, ...snap.data() } as AdminProfile);
           setClearance("granted");
         } else {
-          // Signed in, but not staff. Deny clearance without touching the
-          // session itself.
-          //
-          // Firebase Auth is one identity per browser, not one per tab or
-          // route: signing out here used to end the session for every open
-          // tab on this origin, including a player who had just signed in on
-          // /community in a different tab. Denying clearance already keeps
-          // this console's own UI and its Firestore rules closed to a
-          // non-admin; it does not also need to log everyone else out.
           setAdmin(null);
           setClearance("denied");
         }
       } catch {
-        // A rules rejection or a dropped connection lands here. Fail closed.
         setAdmin(null);
         setClearance("denied");
       }
@@ -99,12 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const snap = await getDoc(doc(db, COLLECTIONS.admins, credential.user.uid));
 
     if (!snap.exists() || snap.data()?.role !== "admin") {
-      // Same reasoning as the listener: these credentials might belong to a
-      // real player with a session open elsewhere, so the failure here is
-      // reported without signing that identity out of the browser.
       throw new NotAnAdminError();
     }
-    // The listener above promotes clearance to "granted".
   }, []);
 
   const leave = useCallback(async () => {

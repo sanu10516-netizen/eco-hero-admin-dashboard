@@ -8,14 +8,6 @@ import { COLLECTIONS } from "@/lib/schema";
 
 export type ConnectionState = "connecting" | "live" | "offline";
 
-/**
- * Reports whether the console is actually receiving data.
- *
- * A single document listener is enough to tell the difference, and it costs one
- * read. The browser online event is folded in because a dropped network can
- * leave an existing listener idle rather than erroring, which would otherwise
- * keep the indicator green while nothing is arriving.
- */
 export function useConnection(): ConnectionState {
   const [state, setState] = useState<ConnectionState>("connecting");
 
@@ -25,8 +17,6 @@ export function useConnection(): ConnectionState {
     const stop = onSnapshot(
       probe,
       (snapshot) => {
-        // fromCache with no pending writes means Firestore has fallen back to
-        // its local copy and is no longer talking to the server.
         setState(snapshot.metadata.fromCache && !navigator.onLine ? "offline" : "live");
       },
       () => setState("offline"),
@@ -37,11 +27,6 @@ export function useConnection(): ConnectionState {
 
     window.addEventListener("online", online);
     window.addEventListener("offline", offline);
-
-    // Not checked synchronously here. The server renders "connecting", so
-    // reading navigator during the first client pass would produce a hydration
-    // mismatch. A device that is already offline reaches the same state through
-    // the listener error below.
 
     return () => {
       stop();

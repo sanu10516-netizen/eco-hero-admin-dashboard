@@ -8,7 +8,6 @@ import { TONE_CHIP } from "@/components/ui/panel";
 
 type Tone = "canopy" | "tide" | "sun" | "coral" | "berry" | "neutral";
 
-/** The colour of the thin bar along the top edge of each tile. */
 const TONE_EDGE: Record<Tone, string> = {
   canopy: "bg-canopy",
   tide: "bg-tide",
@@ -18,17 +17,6 @@ const TONE_EDGE: Record<Tone, string> = {
   neutral: "bg-line-strong",
 };
 
-/**
- * Single figure with its supporting context.
- *
- * Each tile is its own card rather than a cell in a hairline grid. Separate
- * cards can lift on hover and carry their own accent, which is what makes the
- * row read as a game HUD rather than a table header.
- *
- * The figure is passed as a number, not a formatted string, so it can be
- * counted up. Formatting happens per frame through the same helper the rest of
- * the console uses, so a counting value and a settled one are spelled the same.
- */
 export function MetricCard({
   label,
   value,
@@ -48,8 +36,6 @@ export function MetricCard({
 }) {
   return (
     <div className="reveal-item card-lift group relative overflow-hidden rounded-2xl border border-line bg-surface p-5">
-      {/* Accent edge. Reads at a glance from across a room, which is the only
-          job a metric tile has. */}
       <span aria-hidden className={`absolute inset-x-0 top-0 h-1 ${TONE_EDGE[tone]}`} />
 
       <div className="flex items-start justify-between gap-3">
@@ -73,7 +59,6 @@ export function MetricCard({
   );
 }
 
-/** Row wrapper. Real gaps rather than hairlines, so each tile stays a tile. */
 export function MetricGrid({ children }: { children: ReactNode }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{children}</div>

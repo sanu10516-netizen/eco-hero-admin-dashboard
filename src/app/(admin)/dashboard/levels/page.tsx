@@ -54,8 +54,6 @@ export default function LevelsPage() {
       if (end && start) {
         entry.finished += 1;
         const seconds = (end.getTime() - start.getTime()) / 1000;
-        // Guard against clock skew and sessions left open across a restart,
-        // either of which would drag the average somewhere meaningless.
         if (seconds > 0 && seconds < 60 * 60 * 3) entry.durations.push(seconds);
       }
     });
@@ -86,7 +84,6 @@ export default function LevelsPage() {
       .sort((a, b) => a.level - b.level);
   }, [sessions.data, scores.data]);
 
-  // Worst completion rate, only once there is enough data to mean anything.
   const friction = useMemo(() => {
     const eligible = rows.filter((row) => row.started >= 3);
     if (!eligible.length) return null;
@@ -112,8 +109,6 @@ export default function LevelsPage() {
         detail="How each level performs once players reach it, measured from opened and closed sessions rather than from level configuration."
       />
 
-      {/* The page this replaces edited level records the game never read. That
-          is worth stating plainly rather than quietly dropping the feature. */}
       <div className="reveal-item flex items-start gap-3 rounded-lg border border-tide/20 bg-tide/6 px-4 py-3.5">
         <Info size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-tide" />
         <p className="text-[13px] leading-relaxed text-ink-soft">

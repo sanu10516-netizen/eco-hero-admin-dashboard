@@ -11,7 +11,6 @@ import { FluidLoader } from "@/components/fluid-loader";
 
 type Phase = "idle" | "authenticating" | "verifying" | "error";
 
-/** Firebase error codes translated into something an operator can act on. */
 function explain(cause: unknown): string {
   if (cause instanceof NotAnAdminError) {
     return "Those credentials are valid, but the account has no admin clearance. An existing administrator must add a document at admins/{uid} with role set to admin.";
@@ -49,7 +48,6 @@ export default function LoginPage() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [message, setMessage] = useState("");
 
-  // A live session should never sit staring at the login form.
   useEffect(() => {
     if (clearance === "granted") router.replace("/dashboard");
   }, [clearance, router]);
@@ -64,8 +62,6 @@ export default function LoginPage() {
     setMessage("");
 
     try {
-      // Split for honesty in the UI: the credential check and the clearance
-      // lookup are two separate round trips and the second is the slower one.
       setTimeout(() => setPhase((p) => (p === "authenticating" ? "verifying" : p)), 450);
       await signIn(email, password);
       router.replace("/dashboard");
@@ -85,8 +81,6 @@ export default function LoginPage() {
 
   return (
     <main className="grid min-h-screen grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
-      {/* The world the console watches over. Hidden on small screens, where it
-          would only push the form below the fold. */}
       <section className="relative hidden overflow-hidden lg:block">
         <div className="relative flex h-full flex-col justify-between overflow-y-auto p-12">
           <div className="flex items-center gap-3">
@@ -115,11 +109,6 @@ export default function LoginPage() {
               numbers behind that land here.
             </p>
 
-            {/* The restoration loop, on a card of its own.
-                It used to be drawn straight onto the page, where the daylight
-                backdrop behind it washed the strokes out until the whole thing
-                was invisible. On white it reads properly, and it stops two
-                animations from competing for the same patch of sky. */}
             <div
               style={{ animationDelay: "200ms" }}
               className="rise mt-8 hidden w-full max-w-[460px] rounded-3xl border border-line bg-surface p-5 [@media(min-height:820px)]:block shadow-[0_2px_4px_rgba(20,48,28,0.05),0_24px_50px_-30px_rgba(20,48,28,0.35)]"
@@ -148,7 +137,6 @@ export default function LoginPage() {
         </div>
       </section>
 
-      {/* Credentials */}
       <section className="flex items-center justify-center px-5 py-12 sm:px-10">
         <div
           className="rise w-full max-w-[400px] rounded-3xl border border-line bg-surface p-7 shadow-[0_2px_4px_rgba(20,48,28,0.05),0_28px_60px_-30px_rgba(20,48,28,0.4)] sm:p-9"
@@ -248,7 +236,6 @@ export default function LoginPage() {
   );
 }
 
-/** Input frame. The border warms to green on focus rather than glowing. */
 function Field({
   id,
   label,

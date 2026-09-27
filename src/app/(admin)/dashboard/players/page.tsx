@@ -33,7 +33,6 @@ export default function PlayersPage() {
       setDescending((value) => !value);
     } else {
       setSortKey(key);
-      // Names read naturally A to Z, figures read best highest first.
       setDescending(key !== "username");
     }
   }
@@ -47,7 +46,6 @@ export default function PlayersPage() {
         />
 
         <Panel className="reveal-item overflow-hidden">
-          {/* Controls */}
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-5 py-4">
             <div className="relative w-full max-w-xs">
               <Search
@@ -97,7 +95,6 @@ export default function PlayersPage() {
             )
           ) : (
             <>
-              {/* Table from small screens up */}
               <div className="hidden overflow-x-auto sm:block">
                 <table className="w-full border-collapse text-left">
                   <thead>
@@ -191,8 +188,6 @@ export default function PlayersPage() {
                 </table>
               </div>
 
-              {/* Stacked cards below that, since a four column table cannot be
-                  read on a phone without horizontal scrolling. */}
               <ul className="divide-y divide-line sm:hidden">
                 {rows.map((player) => (
                   <li key={player.uid}>
@@ -223,8 +218,6 @@ export default function PlayersPage() {
                 ))}
               </ul>
 
-              {/* Paging. Hidden while searching, where the range query returns
-                  one bounded set rather than a walkable sequence. */}
               {!searching ? (
                 <div className="flex items-center justify-between gap-4 border-t border-line px-5 py-3.5">
                   <p className="text-[12.5px] text-ink-faint">

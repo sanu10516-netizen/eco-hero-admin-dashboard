@@ -11,14 +11,6 @@ export interface Standing {
   level: number;
 }
 
-/**
- * Ranked standings.
- *
- * The top three are marked by tone and by a number, never by colour alone, so
- * the ranking still reads correctly in a screenshot, in print, and to anyone who
- * cannot tell the medal colours apart. Positions beyond third are numbered
- * plainly.
- */
 export function Leaderboard({ standings }: { standings: Standing[] }) {
   if (!standings.length) {
     return (
@@ -65,8 +57,6 @@ export function Leaderboard({ standings }: { standings: Standing[] }) {
             <div className="min-w-0 flex-1">
               <p className="truncate text-[13.5px] font-medium text-ink">{entry.username}</p>
 
-              {/* The bar shows the gap to the leader, which is the thing a
-                  ranking actually communicates. */}
               <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-base-deep">
                 <div
                   className="grow-bar h-full rounded-full"

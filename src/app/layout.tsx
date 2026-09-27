@@ -5,19 +5,12 @@ import "./globals.css";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { WorldBackdrop } from "@/components/world-backdrop";
 
-/** Body copy and tables. Neutral on purpose, so the data stays the loudest thing. */
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
 
-/**
- * Headings and every large figure.
- *
- * Rounded and heavy, the way the game's own UI is drawn. It is what stops the
- * console reading as a generic dashboard the moment you look at it.
- */
 const fredoka = Fredoka({
   variable: "--font-fredoka",
   subsets: ["latin"],
@@ -25,7 +18,6 @@ const fredoka = Fredoka({
   display: "swap",
 });
 
-/** Identifiers and raw Firestore output only. */
 const jet = JetBrains_Mono({
   variable: "--font-jet",
   subsets: ["latin"],
