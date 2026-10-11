@@ -19,7 +19,7 @@ export function HeroBand({
 }: {
   eyebrow: string;
   title: string;
-  detail: string;
+  detail?: string;
   stats: HeroStat[];
   loading?: boolean;
 }) {
@@ -38,12 +38,14 @@ export function HeroBand({
             {title}
           </h1>
 
-          <p
-            className="rise mt-3 text-[14.5px] leading-relaxed text-white/85"
-            style={{ animationDelay: "90ms" }}
-          >
-            {detail}
-          </p>
+          {detail ? (
+            <p
+              className="rise mt-3 text-[14.5px] leading-relaxed text-white/85"
+              style={{ animationDelay: "90ms" }}
+            >
+              {detail}
+            </p>
+          ) : null}
         </div>
 
         <div className="flex shrink-0 flex-wrap gap-3 sm:gap-4">

@@ -208,7 +208,6 @@ export default function OperationsPage() {
       <HeroBand
         eyebrow="Live from Firestore"
         title="Eco Hero mission control"
-        detail="Every figure here is written by the game itself. Nothing on this page is estimated, sampled or filled in."
         loading={loading}
         stats={[
           { label: "Players", value: stats.players, format: formatNumber },

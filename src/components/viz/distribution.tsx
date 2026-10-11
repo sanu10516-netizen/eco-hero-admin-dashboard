@@ -33,11 +33,6 @@ export function Distribution({
     <div className="rounded-2xl border border-line bg-surface p-5 card-lift">
       <p className="font-display text-[15px] font-semibold leading-snug text-ink">{prompt}</p>
 
-      <p className="mt-1.5 text-[12px] text-ink-faint">
-        {total} {total === 1 ? "response" : "responses"} across {tallies.length}{" "}
-        {tallies.length === 1 ? "option" : "distinct options"}
-      </p>
-
       <ul className="mt-5 space-y-3.5">
         {tallies.map((entry, index) => {
           const share = Math.round((entry.count / total) * 100);
