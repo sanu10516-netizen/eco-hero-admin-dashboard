@@ -42,7 +42,6 @@ export default function PlayersPage() {
       <Reveal className="space-y-6">
         <PageHeading
           eyebrow="Accounts" title="Players"
-          detail="Every registered account, read a page at a time. Select a row to open the full record."
         />
 
         <Panel className="reveal-item overflow-hidden">

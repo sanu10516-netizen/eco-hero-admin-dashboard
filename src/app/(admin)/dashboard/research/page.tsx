@@ -97,7 +97,6 @@ export default function ResearchPage() {
     <Reveal className="space-y-6">
       <PageHeading
         eyebrow="Survey" title="Research"
-        detail="Questionnaire responses collected after missions. This is the measured output of the study, so nothing here is rounded, grouped or inferred."
         action={
           <button
             type="button"

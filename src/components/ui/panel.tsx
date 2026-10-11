@@ -79,7 +79,7 @@ export function PageHeading({
   action,
 }: {
   title: string;
-  detail: string;
+  detail?: string;
   eyebrow?: string;
   action?: ReactNode;
 }) {
@@ -96,7 +96,9 @@ export function PageHeading({
           {title}
         </h1>
 
-        <p className="mt-2 max-w-[68ch] text-[14px] leading-relaxed text-ink-soft">{detail}</p>
+        {detail ? (
+          <p className="mt-2 max-w-[68ch] text-[14px] leading-relaxed text-ink-soft">{detail}</p>
+        ) : null}
       </div>
 
       {action ? <div className="shrink-0">{action}</div> : null}
