@@ -16,6 +16,7 @@ import {
 import { useLiveCollection } from "@/lib/use-collection";
 import { COLLECTIONS, type PlayerDoc, type ScoreDoc, type SessionDoc } from "@/lib/schema";
 import { formatCompact, formatNumber, formatRelative, toDate } from "@/lib/format";
+import { levelBadge, levelLabel, progressLabel, sessionCompleted } from "@/lib/levels";
 import { MetricCard, MetricGrid } from "@/components/ui/metric-card";
 import { Panel, PanelHeader, Chip } from "@/components/ui/panel";
 import { HeroBand } from "@/components/ui/hero-band";
@@ -78,7 +79,7 @@ export default function OperationsPage() {
     const starsAwarded = scores.data.reduce((sum, run) => sum + (run.stars ?? 0), 0);
     const perfect = scores.data.filter((run) => (run.stars ?? 0) >= 3).length;
 
-    const finished = sessions.data.filter((session) => Boolean(session.endTime)).length;
+    const finished = sessions.data.filter(sessionCompleted).length;
     const clearRate = sessions.data.length ? finished / sessions.data.length : 0;
 
     const deepest = players.data.reduce(
@@ -111,7 +112,7 @@ export default function OperationsPage() {
     return Array.from(counts.entries())
       .sort((a, b) => a[0] - b[0])
       .map(([level, count]) => ({
-        label: level === 1 ? "Level 1, tutorial" : `Level ${level}`,
+        label: progressLabel(level),
         value: count,
         note: count === 1 ? "player" : "players",
         accent: "tide" as const,
@@ -192,7 +193,6 @@ export default function OperationsPage() {
         <HeroBand
           eyebrow="Live from Firestore"
           title="Eco Hero mission control"
-          detail="How the game is being played right now, read straight from the records the client writes."
           stats={[]}
         />
         <ErrorState error={failure} />
@@ -224,11 +224,6 @@ export default function OperationsPage() {
             label="Registered players"
             value={stats.players}
             format={formatNumber}
-            detail={
-              stats.deepest > 1
-                ? `Furthest progress is level ${stats.deepest}`
-                : "All still on the tutorial"
-            }
             icon={Users}
             tone="canopy"
           />
@@ -237,7 +232,6 @@ export default function OperationsPage() {
             label="Playing now"
             value={stats.active}
             format={formatNumber}
-            detail={`Runs opened in the last ${ACTIVE_WINDOW_MINUTES} minutes`}
             icon={Radio}
             tone="tide"
           />
@@ -246,11 +240,6 @@ export default function OperationsPage() {
             label="Runs completed"
             value={stats.runs}
             format={formatNumber}
-            detail={
-              stats.averageScore
-                ? `${formatNumber(stats.averageScore)} points on average`
-                : "No runs finished yet"
-            }
             icon={Flag}
             tone="berry"
           />
@@ -259,11 +248,6 @@ export default function OperationsPage() {
             label="Best run"
             value={stats.best?.score ?? 0}
             format={formatCompact}
-            detail={
-              stats.best
-                ? `${stats.best.username || "Unnamed player"} on level ${stats.best.level ?? "?"}`
-                : "Set by the first completed level"
-            }
             icon={Crown}
             tone="sun"
           />
@@ -274,7 +258,6 @@ export default function OperationsPage() {
         <EmptyState
           collection={`${COLLECTIONS.players} and ${COLLECTIONS.scores}`}
           title="The game has not written anything yet"
-          detail="Register a player in the app and finish a level. Every panel on this page fills from that first run."
         />
       ) : (
         <>
@@ -282,7 +265,6 @@ export default function OperationsPage() {
             <Panel className="reveal-item">
               <PanelHeader
                 title="Activity"
-                detail="Levels completed per day over the last fortnight."
                 icon={Activity}
                 tone="canopy"
                 action={
@@ -316,7 +298,6 @@ export default function OperationsPage() {
             <Panel className="reveal-item">
               <PanelHeader
                 title="Standings"
-                detail="Best single run per player."
                 icon={Trophy}
                 tone="sun"
               />
@@ -329,7 +310,6 @@ export default function OperationsPage() {
             <Panel className="reveal-item">
               <PanelHeader
                 title="Where players are"
-                detail="Current level across the whole player base."
                 icon={Gauge}
                 tone="tide"
               />
@@ -344,7 +324,6 @@ export default function OperationsPage() {
             <Panel className="reveal-item">
               <PanelHeader
                 title="How well they play"
-                detail="Stars awarded across completed runs."
                 icon={Star}
                 tone="sun"
                 action={<Chip tone="sun">{formatNumber(stats.starsAwarded)} total</Chip>}
@@ -363,7 +342,7 @@ export default function OperationsPage() {
                         value={`${formatNumber(stats.perfect)} of ${formatNumber(stats.runs)}`}
                       />
                       <Footnote
-                        label="Sessions finished"
+                        label="Sessions completed"
                         value={`${Math.round(stats.clearRate * 100)}%`}
                       />
                     </div>
@@ -376,7 +355,6 @@ export default function OperationsPage() {
           <Panel className="reveal-item" lift={false}>
             <PanelHeader
               title="Latest runs"
-              detail="The six most recent completions."
               icon={Flag}
               tone="berry"
             />
@@ -387,7 +365,6 @@ export default function OperationsPage() {
               <EmptyState
                 collection={COLLECTIONS.scores}
                 title="No runs have been recorded"
-                detail="A row appears here each time a player finishes a level."
               />
             ) : (
               <ul className="divide-y divide-line">
@@ -397,7 +374,7 @@ export default function OperationsPage() {
                     className="flex items-center gap-4 px-5 py-3.5 transition-colors duration-300 hover:bg-surface-high"
                   >
                     <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-canopy-soft font-display text-[13px] font-semibold text-canopy-deep">
-                      {run.level ?? "?"}
+                      {levelBadge(run.level)}
                     </span>
 
                     <div className="min-w-0 flex-1">
@@ -405,7 +382,7 @@ export default function OperationsPage() {
                         {run.username || "Unnamed player"}
                       </p>
                       <p className="text-[12px] text-ink-faint">
-                        Level {run.level ?? "unknown"} · {formatRelative(run.timestamp)}
+                        {levelLabel(run.level)} · {formatRelative(run.timestamp)}
                       </p>
                     </div>
 

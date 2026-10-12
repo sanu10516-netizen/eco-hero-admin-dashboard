@@ -32,11 +32,12 @@ export interface ScoreDoc {
   username?: string;
   score?: number;
   level?: number;
+  levelName?: string;
   stars?: number;
   timestamp?: Timestamp | null;
-
   trashCollected?: number;
   treesPlanted?: number;
+  durationSeconds?: number;
 }
 
 export interface ScoreRun extends ScoreDoc {
@@ -50,6 +51,12 @@ export interface SessionDoc {
   endTime?: Timestamp | null;
   scoreEarned?: number;
   levelPlayed?: number;
+  levelName?: string;
+  result?: string;
+  trashCollected?: number;
+  treesPlanted?: number;
+  stars?: number;
+  durationSeconds?: number;
 }
 
 export interface Session extends SessionDoc {
@@ -70,6 +77,7 @@ export interface Inventory extends InventoryDoc {
 export interface ResearchDoc {
   userId?: string;
   missionNumber?: number;
+  levelName?: string;
   answer1?: string;
   answer2?: string;
   answer3?: string;
@@ -121,3 +129,5 @@ export const RESEARCH_QUESTIONS: { key: "answer1" | "answer2" | "answer3"; promp
   { key: "answer2", prompt: "Would you sort waste correctly in real life?" },
   { key: "answer3", prompt: "Do you feel planting trees makes a measurable difference?" },
 ];
+
+export const SKIPPED_ANSWER = "Skipped";

@@ -3,6 +3,7 @@
 import { Crown } from "lucide-react";
 
 import { formatNumber, initialsFrom } from "@/lib/format";
+import { levelLabel } from "@/lib/levels";
 
 export interface Standing {
   uid: string;
@@ -73,7 +74,7 @@ export function Leaderboard({ standings }: { standings: Standing[] }) {
               <p className="font-display text-[15px] font-semibold text-ink tabular-nums">
                 {formatNumber(entry.score)}
               </p>
-              <p className="text-[11.5px] text-ink-faint">Level {entry.level || "?"}</p>
+              <p className="text-[11.5px] text-ink-faint">{levelLabel(entry.level)}</p>
             </div>
           </li>
         );

@@ -159,12 +159,10 @@ export function SkeletonPage({ panels = 2 }: { panels?: number }) {
 export function EmptyState({
   collection,
   title,
-  detail,
   action,
 }: {
   collection: string;
   title: string;
-  detail?: string;
   action?: ReactNode;
 }) {
   return (
@@ -181,11 +179,6 @@ export function EmptyState({
 
         <h3 className="mt-5 font-display text-[17px] font-semibold text-ink">{title}</h3>
 
-        <p className="mt-2 max-w-md text-[13.5px] leading-relaxed text-ink-soft">
-          {detail ??
-            "Nothing has been written here yet. This is what the view looks like before the game produces data."}
-        </p>
-
         <code className="mt-4 rounded-lg border border-line bg-base-deep px-3 py-1.5 font-mono text-[12px] text-ink-soft">
           {collection} returned 0 documents
         </code>
@@ -199,17 +192,13 @@ export function EmptyState({
 export function ErrorState({
   title = "The database refused this request",
   error,
-  hint,
 }: {
   title?: string;
   error: unknown;
-  hint?: string;
 }) {
   const asRecord = error as { code?: string; message?: string } | null;
   const code = asRecord?.code ?? "unknown";
   const message = asRecord?.message ?? String(error ?? "No detail provided.");
-
-  const isPermission = code.includes("permission-denied");
 
   return (
     <div className="overflow-hidden rounded-2xl border border-coral/30 bg-surface">
@@ -220,13 +209,6 @@ export function ErrorState({
 
         <div className="min-w-0 flex-1">
           <h3 className="font-display text-[17px] font-semibold text-ink">{title}</h3>
-
-          <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-soft">
-            {hint ??
-              (isPermission
-                ? "The signed in account does not satisfy the Firestore rule protecting this path. Confirm the admins document exists and the rules grant it read access."
-                : "The query did not complete. The technical response is below.")}
-          </p>
 
           <div className="mt-4 overflow-x-auto rounded-xl border border-line bg-base-deep p-3.5">
             <p className="font-mono text-[12px] font-medium text-coral-deep">{code}</p>

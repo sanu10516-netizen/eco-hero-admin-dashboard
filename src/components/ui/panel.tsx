@@ -37,13 +37,11 @@ export function Panel({
 
 export function PanelHeader({
   title,
-  detail,
   icon: Icon,
   tone = "neutral",
   action,
 }: {
   title: string;
-  detail?: string;
   icon?: LucideIcon;
   tone?: Tone;
   action?: ReactNode;
@@ -63,7 +61,6 @@ export function PanelHeader({
           <h2 className="font-display text-[16px] font-semibold tracking-tight text-ink">
             {title}
           </h2>
-          {detail ? <p className="mt-0.5 text-[13px] text-ink-soft">{detail}</p> : null}
         </div>
       </div>
 
@@ -74,12 +71,10 @@ export function PanelHeader({
 
 export function PageHeading({
   title,
-  detail,
   eyebrow,
   action,
 }: {
   title: string;
-  detail?: string;
   eyebrow?: string;
   action?: ReactNode;
 }) {
@@ -96,9 +91,6 @@ export function PageHeading({
           {title}
         </h1>
 
-        {detail ? (
-          <p className="mt-2 max-w-[68ch] text-[14px] leading-relaxed text-ink-soft">{detail}</p>
-        ) : null}
       </div>
 
       {action ? <div className="shrink-0">{action}</div> : null}

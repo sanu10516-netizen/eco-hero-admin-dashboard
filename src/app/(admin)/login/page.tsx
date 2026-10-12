@@ -101,14 +101,6 @@ export default function LoginPage() {
               Clear it up. Grow it back.
             </h2>
 
-            <p
-              className="rise mt-4 max-w-[42ch] text-[14.5px] leading-relaxed text-ink-soft"
-              style={{ animationDelay: "110ms" }}
-            >
-              Every run in the game ends the same way. Litter goes, saplings go in, and the
-              numbers behind that land here.
-            </p>
-
             <div
               style={{ animationDelay: "200ms" }}
               className="rise mt-8 hidden w-full max-w-[460px] rounded-3xl border border-line bg-surface p-5 [@media(min-height:820px)]:block shadow-[0_2px_4px_rgba(20,48,28,0.05),0_24px_50px_-30px_rgba(20,48,28,0.35)]"
@@ -125,11 +117,6 @@ export default function LoginPage() {
               </div>
 
               <RestorationScene className="w-full" />
-
-              <p className="mt-3 text-[12.5px] leading-relaxed text-ink-soft">
-                Clear the litter, plant the sapling, let it grow. One run of the game, drawn the
-                way the console counts it.
-              </p>
             </div>
           </div>
 
@@ -149,11 +136,6 @@ export default function LoginPage() {
           <h1 className="mt-5 font-display text-[26px] font-semibold leading-tight tracking-tight text-ink">
             Sign in to the console
           </h1>
-
-          <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-            Accounts are created in Firebase and granted clearance separately. There is no self
-            registration.
-          </p>
 
           <form onSubmit={submit} className="mt-7 space-y-5" noValidate>
             <Field id="email" label="Email address" icon={<Mail size={16} strokeWidth={2} />}>
@@ -225,11 +207,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          <p className="mt-7 border-t border-line pt-5 text-[12.5px] leading-relaxed text-ink-faint">
-            Every route behind this screen verifies clearance against the admins collection on
-            load, so a direct link cannot be used to step around sign in.
-          </p>
         </div>
       </section>
     </main>

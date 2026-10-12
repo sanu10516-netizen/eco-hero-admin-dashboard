@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { Info, Star, TimerReset, TrendingDown } from "lucide-react";
+import { Star, TimerReset } from "lucide-react";
 
 import { useLiveCollection } from "@/lib/use-collection";
 import { COLLECTIONS, type ScoreDoc, type SessionDoc } from "@/lib/schema";
-import { formatNumber, formatPercent, toDate } from "@/lib/format";
+import { formatNumber, toDate } from "@/lib/format";
+import { levelBadge, levelLabel, sessionCompleted } from "@/lib/levels";
 import { PageHeading, Panel, PanelHeader } from "@/components/ui/panel";
 import { EmptyState, ErrorState, Skeleton } from "@/components/ui/states";
 import { Reveal } from "@/components/reveal";
@@ -13,12 +14,22 @@ import { Reveal } from "@/components/reveal";
 interface LevelRow {
   level: number;
   started: number;
-  finished: number;
-  abandoned: number;
+  completed: number;
+  failed: number;
+  leftEarly: number;
   completionRate: number;
   averageSeconds: number | null;
   averageScore: number | null;
   averageStars: number | null;
+}
+
+interface Bucket {
+  started: number;
+  completed: number;
+  failed: number;
+  durations: number[];
+  scores: number[];
+  stars: number[];
 }
 
 export default function LevelsPage() {
@@ -29,14 +40,11 @@ export default function LevelsPage() {
   const failure = sessions.error ?? scores.error;
 
   const rows = useMemo<LevelRow[]>(() => {
-    const byLevel = new Map<
-      number,
-      { started: number; finished: number; durations: number[]; scores: number[]; stars: number[] }
-    >();
+    const byLevel = new Map<number, Bucket>();
 
     const bucket = (level: number) => {
       if (!byLevel.has(level)) {
-        byLevel.set(level, { started: 0, finished: 0, durations: [], scores: [], stars: [] });
+        byLevel.set(level, { started: 0, completed: 0, failed: 0, durations: [], scores: [], stars: [] });
       }
       return byLevel.get(level)!;
     };
@@ -48,14 +56,20 @@ export default function LevelsPage() {
       const entry = bucket(level);
       entry.started += 1;
 
-      const start = toDate(session.startTime);
-      const end = toDate(session.endTime);
+      if (session.result === "failed") entry.failed += 1;
 
-      if (end && start) {
-        entry.finished += 1;
-        const seconds = (end.getTime() - start.getTime()) / 1000;
-        if (seconds > 0 && seconds < 60 * 60 * 3) entry.durations.push(seconds);
+      if (!sessionCompleted(session)) return;
+      entry.completed += 1;
+
+      let seconds = typeof session.durationSeconds === "number" ? session.durationSeconds : null;
+
+      if (seconds === null) {
+        const start = toDate(session.startTime);
+        const end = toDate(session.endTime);
+        if (start && end) seconds = (end.getTime() - start.getTime()) / 1000;
       }
+
+      if (seconds !== null && seconds > 0 && seconds < 60 * 60 * 3) entry.durations.push(seconds);
     });
 
     scores.data.forEach((run) => {
@@ -74,9 +88,10 @@ export default function LevelsPage() {
       .map(([level, entry]) => ({
         level,
         started: entry.started,
-        finished: entry.finished,
-        abandoned: Math.max(0, entry.started - entry.finished),
-        completionRate: entry.started ? entry.finished / entry.started : 0,
+        completed: entry.completed,
+        failed: entry.failed,
+        leftEarly: Math.max(0, entry.started - entry.completed - entry.failed),
+        completionRate: entry.started ? entry.completed / entry.started : 0,
         averageSeconds: mean(entry.durations),
         averageScore: mean(entry.scores),
         averageStars: mean(entry.stars),
@@ -84,19 +99,10 @@ export default function LevelsPage() {
       .sort((a, b) => a.level - b.level);
   }, [sessions.data, scores.data]);
 
-  const friction = useMemo(() => {
-    const eligible = rows.filter((row) => row.started >= 3);
-    if (!eligible.length) return null;
-
-    return eligible.reduce((worst, row) =>
-      row.completionRate < worst.completionRate ? row : worst,
-    );
-  }, [rows]);
-
   if (failure) {
     return (
       <div className="space-y-7">
-        <PageHeading eyebrow="Levels" title="Level analytics" detail="How each level performs in play." />
+        <PageHeading eyebrow="Levels" title="Level analytics" />
         <ErrorState error={failure} />
       </div>
     );
@@ -104,48 +110,10 @@ export default function LevelsPage() {
 
   return (
     <Reveal className="space-y-6">
-      <PageHeading
-        eyebrow="Levels" title="Level analytics"
-        detail="How each level performs once players reach it, measured from opened and closed sessions rather than from level configuration."
-      />
-
-      <div className="reveal-item flex items-start gap-3 rounded-lg border border-tide/20 bg-tide/6 px-4 py-3.5">
-        <Info size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-tide" />
-        <p className="text-[13px] leading-relaxed text-ink-soft">
-          Levels are built as scenes inside the Unity project, so they cannot be edited from here.
-          Changing a value in a database the game never reads would look like it worked and change
-          nothing. This view reports how the levels actually behave instead.
-        </p>
-      </div>
-
-      {friction && friction.completionRate < 0.6 ? (
-        <Panel className="reveal-item border-sun/40">
-          <div className="flex items-start gap-4 p-5">
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-sun/40 bg-sun-soft">
-              <TrendingDown size={17} strokeWidth={2} className="text-sun-deep" />
-            </div>
-
-            <div>
-              <h3 className="text-[14px] font-medium text-ink">
-                Level {friction.level} is where players stop
-              </h3>
-
-              <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">
-                Only {formatPercent(friction.finished, friction.started)} of runs that start this
-                level are finished. {formatNumber(friction.abandoned)} of{" "}
-                {formatNumber(friction.started)} were left open, which usually means players quit
-                partway rather than failing at the end.
-              </p>
-            </div>
-          </div>
-        </Panel>
-      ) : null}
+      <PageHeading eyebrow="Levels" title="Level analytics" />
 
       <Panel className="reveal-item overflow-hidden">
-        <PanelHeader
-          title="Per level performance"
-          detail="A run counts as finished once the session records an end time."
-        />
+        <PanelHeader title="Per level performance" />
 
         {loading ? (
           <div className="space-y-3 p-5">
@@ -154,20 +122,18 @@ export default function LevelsPage() {
             ))}
           </div>
         ) : rows.length === 0 ? (
-          <EmptyState
-            collection={COLLECTIONS.sessions}
-            title="No sessions have been recorded"
-            detail="The game opens a session document when a level starts and closes it on completion. Nothing can be measured until players have played."
-          />
+          <EmptyState collection={COLLECTIONS.sessions} title="No sessions have been recorded" />
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px] border-collapse text-left">
+            <table className="w-full min-w-[900px] border-collapse text-left">
               <thead>
                 <tr className="border-b border-line">
                   {[
                     "Level",
                     "Runs started",
-                    "Finished",
+                    "Completed",
+                    "Failed",
+                    "Left early",
                     "Completion",
                     "Average time",
                     "Average score",
@@ -192,21 +158,16 @@ export default function LevelsPage() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         <span className="flex size-8 items-center justify-center rounded-xl border border-line bg-base font-mono text-[12px] text-ink">
-                          {row.level}
+                          {levelBadge(row.level)}
                         </span>
-                        <span className="text-[13.5px] text-ink-soft">
-                          {row.level === 1 ? "Tutorial" : `Level ${row.level}`}
-                        </span>
+                        <span className="text-[13.5px] text-ink-soft">{levelLabel(row.level)}</span>
                       </div>
                     </td>
 
-                    <td className="px-5 py-4 text-right font-display text-[14px] font-medium text-ink-soft tabular-nums">
-                      {formatNumber(row.started)}
-                    </td>
-
-                    <td className="px-5 py-4 text-right font-display text-[14px] font-medium text-ink-soft tabular-nums">
-                      {formatNumber(row.finished)}
-                    </td>
+                    <Figure value={formatNumber(row.started)} />
+                    <Figure value={formatNumber(row.completed)} />
+                    <Figure value={formatNumber(row.failed)} />
+                    <Figure value={formatNumber(row.leftEarly)} />
 
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-3">
@@ -268,6 +229,14 @@ export default function LevelsPage() {
         )}
       </Panel>
     </Reveal>
+  );
+}
+
+function Figure({ value }: { value: string }) {
+  return (
+    <td className="px-5 py-4 text-right font-display text-[14px] font-medium text-ink-soft tabular-nums">
+      {value}
+    </td>
   );
 }
 
