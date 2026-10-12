@@ -6,6 +6,7 @@ import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Search } from "lucide-re
 import { usePagedPlayers, type SortKey } from "@/lib/use-paged-players";
 import { COLLECTIONS, type Player } from "@/lib/schema";
 import { formatNumber, initialsFrom, shortId } from "@/lib/format";
+import { progressLabel } from "@/lib/levels";
 import { PageHeading, Panel } from "@/components/ui/panel";
 import { EmptyState, ErrorState, SkeletonTable } from "@/components/ui/states";
 import { PlayerDrawer } from "@/components/player-drawer";
@@ -80,16 +81,11 @@ export default function PlayersPage() {
             searching ? (
               <div className="px-6 py-16 text-center">
                 <p className="text-[14px] text-ink">No username begins with that text</p>
-                <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-ink-soft">
-                  Firestore matches from the start of a name rather than anywhere inside it, so
-                  partial matches from the middle of a name will not appear.
-                </p>
               </div>
             ) : (
               <EmptyState
                 collection={COLLECTIONS.players}
                 title="No player accounts exist yet"
-                detail="A document is written here the first time someone registers in the game."
               />
             )
           ) : (
@@ -171,7 +167,7 @@ export default function PlayersPage() {
                         </td>
 
                         <td className="px-5 py-3.5 text-right font-display text-[14px] font-medium text-ink-soft tabular-nums">
-                          {formatNumber(player.currentLevel)}
+                          {progressLabel(player.currentLevel)}
                         </td>
 
                         <td className="px-5 py-3.5 text-right font-display text-[14px] font-semibold text-ink tabular-nums">
@@ -204,7 +200,7 @@ export default function PlayersPage() {
                           {player.username || "Unnamed player"}
                         </span>
                         <span className="block truncate text-[12px] text-ink-faint">
-                          Level {formatNumber(player.currentLevel)} ·{" "}
+                          {progressLabel(player.currentLevel)} ·{" "}
                           {formatNumber(player.coins)} coins
                         </span>
                       </span>

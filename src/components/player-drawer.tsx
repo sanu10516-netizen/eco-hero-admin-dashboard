@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { doc, getDoc, getDocs, limit, orderBy, query, where, collection } from "firebase/firestore";
+import { doc, getDoc, getDocs, query, where, collection } from "firebase/firestore";
 import { Layers, Shirt, Star, X } from "lucide-react";
 
 import { db } from "@/lib/firebase";
@@ -20,7 +20,9 @@ import {
   formatRelative,
   initialsFrom,
   shortId,
+  toDate,
 } from "@/lib/format";
+import { levelBadge, levelLabel, progressLabel, sessionCompleted } from "@/lib/levels";
 import { FluidLoader } from "@/components/fluid-loader";
 import { ErrorState } from "@/components/ui/states";
 
@@ -61,22 +63,8 @@ export function PlayerDrawer({
       try {
         const [inventorySnap, runsSnap, sessionsSnap] = await Promise.all([
           getDoc(doc(db, COLLECTIONS.inventory, player.uid)),
-          getDocs(
-            query(
-              collection(db, COLLECTIONS.scores),
-              where("userId", "==", player.uid),
-              orderBy("timestamp", "desc"),
-              limit(12),
-            ),
-          ),
-          getDocs(
-            query(
-              collection(db, COLLECTIONS.sessions),
-              where("userId", "==", player.uid),
-              orderBy("startTime", "desc"),
-              limit(12),
-            ),
-          ),
+          getDocs(query(collection(db, COLLECTIONS.scores), where("userId", "==", player.uid))),
+          getDocs(query(collection(db, COLLECTIONS.sessions), where("userId", "==", player.uid))),
         ]);
 
         if (cancelled) return;
@@ -86,10 +74,14 @@ export function PlayerDrawer({
           error: null,
           detail: {
             inventory: inventorySnap.exists() ? (inventorySnap.data() as InventoryDoc) : null,
-            runs: runsSnap.docs.map((entry) => ({ id: entry.id, ...entry.data() }) as ScoreRun),
-            sessions: sessionsSnap.docs.map(
-              (entry) => ({ id: entry.id, ...entry.data() }) as Session,
-            ),
+            runs: runsSnap.docs
+              .map((entry) => ({ id: entry.id, ...entry.data() }) as ScoreRun)
+              .sort((x, y) => (toDate(y.timestamp)?.getTime() ?? 0) - (toDate(x.timestamp)?.getTime() ?? 0))
+              .slice(0, 12),
+            sessions: sessionsSnap.docs
+              .map((entry) => ({ id: entry.id, ...entry.data() }) as Session)
+              .sort((x, y) => (toDate(y.startTime)?.getTime() ?? 0) - (toDate(x.startTime)?.getTime() ?? 0))
+              .slice(0, 12),
           },
         });
       } catch (cause) {
@@ -163,7 +155,7 @@ export function PlayerDrawer({
             <div className="flex-1 overflow-y-auto">
               <div className="grid grid-cols-3 gap-px border-b border-line bg-line">
                 <Figure label="Total score" value={formatNumber(player.totalScore)} />
-                <Figure label="Level" value={formatNumber(player.currentLevel)} />
+                <Figure label="Progress" value={progressLabel(player.currentLevel)} />
                 <Figure label="Coins" value={formatNumber(player.coins)} />
               </div>
 
@@ -210,10 +202,7 @@ export function PlayerDrawer({
                         </div>
                       </div>
                     ) : (
-                      <Note>
-                        No document at {COLLECTIONS.inventory}/{shortId(player.uid)}. The game
-                        creates this on registration, so an older account may predate it.
-                      </Note>
+                      <Note>No inventory record.</Note>
                     )}
                   </Section>
 
@@ -223,11 +212,13 @@ export function PlayerDrawer({
                         {detail.runs.map((run) => (
                           <li key={run.id} className="flex items-center gap-3 bg-base px-3.5 py-3">
                             <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-canopy-soft font-display text-[11px] text-ink-faint">
-                              {run.level ?? "?"}
+                              {levelBadge(run.level)}
                             </span>
 
                             <div className="min-w-0 flex-1">
-                              <p className="text-[13px] text-ink">{formatNumber(run.score)} points</p>
+                              <p className="text-[13px] text-ink">
+                                {levelLabel(run.level)} · {formatNumber(run.score)} points
+                              </p>
                               <p className="text-[11.5px] text-ink-faint">
                                 {formatRelative(run.timestamp)}
                               </p>
@@ -249,17 +240,17 @@ export function PlayerDrawer({
                           <li key={session.id} className="bg-base px-3.5 py-3">
                             <div className="flex items-center justify-between gap-3">
                               <p className="text-[13px] text-ink">
-                                Level {session.levelPlayed ?? "unknown"}
+                                {levelLabel(session.levelPlayed)}
                               </p>
 
                               <span
                                 className={`rounded px-1.5 py-0.5 text-[11px] ${
-                                  session.endTime
-                                    ? "bg-surface-high text-ink-faint"
-                                    : "bg-canopy-soft text-canopy-deep"
+                                  sessionCompleted(session)
+                                    ? "bg-canopy-soft text-canopy-deep"
+                                    : "bg-surface-high text-ink-faint"
                                 }`}
                               >
-                                {session.endTime ? "Finished" : "Open"}
+                                {sessionStatus(session)}
                               </span>
                             </div>
 
@@ -344,4 +335,21 @@ function Stars({ count }: { count: number }) {
       ))}
     </div>
   );
+}
+
+function sessionStatus(session: Session): string {
+  switch (session.result) {
+    case "completed":
+      return "Completed";
+    case "failed":
+      return "Failed";
+    case "abandoned":
+      return "Left early";
+    case "interrupted":
+      return "Interrupted";
+    case "in_progress":
+      return "In progress";
+    default:
+      return session.endTime ? "Ended" : "Open";
+  }
 }

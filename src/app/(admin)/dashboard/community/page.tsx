@@ -9,7 +9,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { Ban, Eye, EyeOff, Info, ShieldOff, Trash2, Undo2 } from "lucide-react";
+import { Ban, Eye, EyeOff, ShieldOff, Trash2, Undo2 } from "lucide-react";
 
 import { db } from "@/lib/firebase";
 import { useLiveCollection } from "@/lib/use-collection";
@@ -112,7 +112,7 @@ export default function CommunityPage() {
   if (posts.error) {
     return (
       <div className="space-y-7">
-        <PageHeading eyebrow="Moderation" title="Community" detail="Posts written by players." />
+        <PageHeading eyebrow="Moderation" title="Community" />
         <ErrorState error={posts.error} />
       </div>
     );
@@ -125,7 +125,6 @@ export default function CommunityPage() {
       <Reveal className="space-y-6">
         <PageHeading
           eyebrow="Moderation" title="Community"
-          detail="Posts written by players, with the moderation actions applied against the same records the game reads."
         />
 
         <div className="reveal-item grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3">
@@ -139,7 +138,6 @@ export default function CommunityPage() {
         <Panel className="reveal-item overflow-hidden">
           <PanelHeader
             title="Posts"
-            detail="Newest first. Hiding is reversible, deleting is not."
             action={
               <div className="flex rounded-xl border border-line-strong p-0.5">
                 {(["all", "visible", "hidden"] as Filter[]).map((value) => (
@@ -170,7 +168,6 @@ export default function CommunityPage() {
             <EmptyState
               collection={COLLECTIONS.posts}
               title="No community posts have been written"
-              detail="This console is ready to moderate posts as soon as something writes them. Nothing does yet: the Unity client has no posting screen, so the collection stays empty until one is added or the web side starts writing to it."
             />
           ) : visiblePosts.length === 0 ? (
             <div className="px-6 py-14 text-center">
@@ -269,7 +266,7 @@ export default function CommunityPage() {
 
         {bans.data.length > 0 ? (
           <Panel className="reveal-item">
-            <PanelHeader title="Banned players" detail="Held in the communityBans collection." />
+            <PanelHeader title="Banned players" />
 
             <ul className="divide-y divide-line">
               {bans.data.map((entry) => (
@@ -295,16 +292,6 @@ export default function CommunityPage() {
             </ul>
           </Panel>
         ) : null}
-
-        <div className="reveal-item flex items-start gap-3 rounded-lg border border-tide/20 bg-tide/6 px-4 py-3.5">
-          <Info size={16} strokeWidth={2} className="mt-0.5 shrink-0 text-tide" />
-          <p className="text-[13px] leading-relaxed text-ink-soft">
-            Moderation writes to {COLLECTIONS.posts} and {COLLECTIONS.bans}. For a ban to stop
-            somebody posting, whichever client writes posts has to check {COLLECTIONS.bans} first,
-            and the security rules have to enforce it. Hiding a post here removes it from any client
-            that filters on the hidden field.
-          </p>
-        </div>
       </Reveal>
 
       <AnimatePresence>

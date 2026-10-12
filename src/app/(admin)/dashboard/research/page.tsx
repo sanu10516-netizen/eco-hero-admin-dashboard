@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { Download, Search } from "lucide-react";
 
 import { useLiveCollection } from "@/lib/use-collection";
-import { COLLECTIONS, RESEARCH_QUESTIONS, type ResearchDoc } from "@/lib/schema";
+import { COLLECTIONS, RESEARCH_QUESTIONS, SKIPPED_ANSWER, type ResearchDoc } from "@/lib/schema";
+import { levelLabel } from "@/lib/levels";
 import { formatDateTime, formatNumber, shortId, toDate } from "@/lib/format";
 import { downloadCsv, stampedFilename, toCsv, type Column } from "@/lib/csv";
 import { PageHeading, Panel, PanelHeader } from "@/components/ui/panel";
@@ -53,7 +54,7 @@ export default function ResearchPage() {
 
       filtered.forEach((row) => {
         const answer = (row[key] ?? "").toString().trim();
-        if (!answer) return;
+        if (!answer || answer === SKIPPED_ANSWER) return;
         counts.set(answer, (counts.get(answer) ?? 0) + 1);
       });
 
@@ -71,7 +72,7 @@ export default function ResearchPage() {
     const columns: Column<Row>[] = [
       { header: "Response ID", value: (row) => row.id },
       { header: "Player ID", value: (row) => row.userId ?? "" },
-      { header: "Mission", value: (row) => row.missionNumber ?? "" },
+      { header: "Level", value: (row) => (row.missionNumber ? levelLabel(row.missionNumber) : "") },
       { header: "Answer 1", value: (row) => row.answer1 ?? "" },
       { header: "Answer 2", value: (row) => row.answer2 ?? "" },
       { header: "Answer 3", value: (row) => row.answer3 ?? "" },
@@ -87,7 +88,7 @@ export default function ResearchPage() {
   if (error) {
     return (
       <div className="space-y-7">
-        <PageHeading eyebrow="Survey" title="Research" detail="Questionnaire responses collected in game." />
+        <PageHeading eyebrow="Survey" title="Research" />
         <ErrorState error={error} />
       </div>
     );
@@ -134,11 +135,6 @@ export default function ResearchPage() {
       <Panel className="reveal-item overflow-hidden">
         <PanelHeader
           title="Individual responses"
-          detail={
-            loading
-              ? "Reading responses"
-              : `${formatNumber(filtered.length)} of ${formatNumber(data.length)} shown`
-          }
           action={
             <div className="flex flex-wrap items-center gap-2">
               <div className="relative">
@@ -160,13 +156,13 @@ export default function ResearchPage() {
               <select
                 value={mission}
                 onChange={(event) => setMission(event.target.value)}
-                aria-label="Filter by mission"
+                aria-label="Filter by level"
                 className="rounded-xl border border-line-strong bg-base px-2.5 py-1.5 text-[13px] text-ink-soft outline-none transition-colors duration-300 focus:border-canopy focus:bg-surface focus:shadow-[0_0_0_4px_rgba(47,168,79,0.14)]"
               >
-                <option value="all">All missions</option>
+                <option value="all">All levels</option>
                 {missions.map((value) => (
                   <option key={value} value={String(value)}>
-                    Mission {value}
+                    {levelLabel(value)}
                   </option>
                 ))}
               </select>
@@ -180,7 +176,6 @@ export default function ResearchPage() {
           <EmptyState
             collection={COLLECTIONS.research}
             title="No questionnaire responses yet"
-            detail="The game writes a document here each time a player completes the questionnaire shown after a mission. If players have finished missions and this is still empty, the questionnaire screen is most likely not built into the client yet."
           />
         ) : filtered.length === 0 ? (
           <div className="px-6 py-14 text-center">
@@ -194,7 +189,7 @@ export default function ResearchPage() {
             <table className="w-full min-w-[720px] border-collapse text-left">
               <thead>
                 <tr className="border-b border-line">
-                  {["Submitted", "Mission", "Player", "Answer 1", "Answer 2", "Answer 3"].map(
+                  {["Submitted", "Level", "Player", "Answer 1", "Answer 2", "Answer 3"].map(
                     (heading) => (
                       <th
                         key={heading}
@@ -220,7 +215,7 @@ export default function ResearchPage() {
 
                     <td className="px-5 py-3.5">
                       <span className="rounded-lg bg-base-deep px-2 py-0.5 font-mono text-[11.5px] text-ink-faint">
-                        {row.missionNumber ?? "?"}
+                        {row.missionNumber ? levelLabel(row.missionNumber) : "?"}
                       </span>
                     </td>
 
@@ -229,15 +224,15 @@ export default function ResearchPage() {
                     </td>
 
                     <td className="max-w-[200px] truncate px-5 py-3.5 text-[13px] text-ink">
-                      {row.answer1 || "No answer"}
+                      <Answer value={row.answer1} />
                     </td>
 
                     <td className="max-w-[200px] truncate px-5 py-3.5 text-[13px] text-ink">
-                      {row.answer2 || "No answer"}
+                      <Answer value={row.answer2} />
                     </td>
 
                     <td className="max-w-[200px] truncate px-5 py-3.5 text-[13px] text-ink">
-                      {row.answer3 || "No answer"}
+                      <Answer value={row.answer3} />
                     </td>
                   </tr>
                 ))}
@@ -248,4 +243,11 @@ export default function ResearchPage() {
       </Panel>
     </Reveal>
   );
+}
+
+function Answer({ value }: { value?: string }) {
+  if (!value || value === SKIPPED_ANSWER) {
+    return <span className="text-ink-faint">Skipped</span>;
+  }
+  return <>{value}</>;
 }

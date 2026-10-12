@@ -21,7 +21,6 @@ export function MetricCard({
   label,
   value,
   format,
-  detail,
   icon: Icon,
   tone = "canopy",
   footer,
@@ -29,7 +28,6 @@ export function MetricCard({
   label: string;
   value: number;
   format?: (input: number) => string;
-  detail?: string;
   icon: LucideIcon;
   tone?: Tone;
   footer?: ReactNode;
@@ -51,8 +49,6 @@ export function MetricCard({
       <p className="mt-3 font-display text-[34px] font-semibold leading-none tracking-tight text-ink">
         <CountUp value={value} format={format} />
       </p>
-
-      {detail ? <p className="mt-2.5 text-[12.5px] text-ink-faint">{detail}</p> : null}
 
       {footer ? <div className="mt-3">{footer}</div> : null}
     </div>

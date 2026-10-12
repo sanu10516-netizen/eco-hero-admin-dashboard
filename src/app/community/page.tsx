@@ -142,11 +142,6 @@ function SignInCard({
         Sign in with your Eco Hero account
       </h1>
 
-      <p className="mt-2 text-[13.5px] leading-relaxed text-ink-soft">
-        Use the same email and password you play the game with. There&apos;s nothing new to
-        create here.
-      </p>
-
       <form onSubmit={submit} className="mt-7 space-y-5" noValidate>
         <Field id="email" label="Email address" icon={<Mail size={16} strokeWidth={2} />}>
           <input
@@ -212,11 +207,6 @@ function SignInCard({
           )}
         </button>
       </form>
-
-      <p className="mt-7 border-t border-line pt-5 text-[12.5px] leading-relaxed text-ink-faint">
-        No account yet? Play a level in Eco Hero first — this page shows the same profile the
-        game already knows about.
-      </p>
     </div>
   );
 }
@@ -406,7 +396,6 @@ function Feed({ uid }: { uid: string }) {
       <EmptyState
         collection={COLLECTIONS.posts}
         title="Nobody has posted yet"
-        detail="Be the first to leave feedback for the Eco Hero community."
       />
     );
   }
