@@ -2,13 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Activity,
   Crown,
   Flag,
   Gauge,
   Radio,
   Star,
-  TrendingUp,
   Trophy,
   Users,
 } from "lucide-react";
@@ -24,11 +22,9 @@ import {
   EmptyState,
   ErrorState,
   SkeletonBars,
-  SkeletonChart,
   SkeletonList,
   SkeletonMetrics,
 } from "@/components/ui/states";
-import { SparkLine, type SeriesPoint } from "@/components/viz/spark-line";
 import { BarList, type BarRow } from "@/components/viz/bar-list";
 import { Leaderboard, type Standing } from "@/components/viz/leaderboard";
 import { Reveal } from "@/components/reveal";
@@ -161,26 +157,6 @@ export default function OperationsPage() {
       .slice(0, 6);
   }, [scores.data]);
 
-  const runTrend = useMemo<SeriesPoint[]>(() => {
-    const buckets = new Map<string, number>();
-
-    for (let offset = 13; offset >= 0; offset -= 1) {
-      const day = new Date();
-      day.setHours(0, 0, 0, 0);
-      day.setDate(day.getDate() - offset);
-      buckets.set(day.toISOString().slice(0, 10), 0);
-    }
-
-    scores.data.forEach((run) => {
-      const when = toDate(run.timestamp);
-      if (!when) return;
-      const key = when.toISOString().slice(0, 10);
-      if (buckets.has(key)) buckets.set(key, (buckets.get(key) ?? 0) + 1);
-    });
-
-    return Array.from(buckets.entries()).map(([key, value]) => ({ label: key, value }));
-  }, [scores.data]);
-
   const recent = useMemo(() => {
     return [...scores.data]
       .sort((a, b) => (toDate(b.timestamp)?.getTime() ?? 0) - (toDate(a.timestamp)?.getTime() ?? 0))
@@ -201,7 +177,6 @@ export default function OperationsPage() {
   }
 
   const noData = !loading && players.data.length === 0 && scores.data.length === 0;
-  const periodRuns = runTrend.reduce((sum, point) => sum + point.value, 0);
 
   return (
     <Reveal className="space-y-6">
@@ -261,50 +236,15 @@ export default function OperationsPage() {
         />
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.55fr_1fr]">
-            <Panel className="reveal-item">
-              <PanelHeader
-                title="Activity"
-                icon={Activity}
-                tone="canopy"
-                action={
-                  <Chip tone="canopy">
-                    <TrendingUp size={13} strokeWidth={2.25} />
-                    {formatNumber(periodRuns)} in period
-                  </Chip>
-                }
-              />
+          <Panel className="reveal-item">
+            <PanelHeader
+              title="Standings"
+              icon={Trophy}
+              tone="sun"
+            />
 
-              <div className="px-2 pb-4 pt-5">
-                {loading ? (
-                  <SkeletonChart height={190} />
-                ) : scores.data.length === 0 ? (
-                  <p className="px-3 py-14 text-center text-[13px] text-ink-faint">
-                    No levels have been completed yet.
-                  </p>
-                ) : (
-                  <SparkLine data={runTrend} />
-                )}
-              </div>
-
-              {!loading && scores.data.length > 0 ? (
-                <div className="flex items-center justify-between border-t border-line px-5 py-3 font-mono text-[11.5px] text-ink-faint">
-                  <span>{runTrend[0]?.label}</span>
-                  <span>{runTrend[runTrend.length - 1]?.label}</span>
-                </div>
-              ) : null}
-            </Panel>
-
-            <Panel className="reveal-item">
-              <PanelHeader
-                title="Standings"
-                icon={Trophy}
-                tone="sun"
-              />
-
-              {loading ? <SkeletonList rows={5} /> : <Leaderboard standings={standings} />}
-            </Panel>
-          </div>
+            {loading ? <SkeletonList rows={5} /> : <Leaderboard standings={standings} />}
+          </Panel>
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
             <Panel className="reveal-item">
