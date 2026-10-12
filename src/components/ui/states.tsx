@@ -65,22 +65,6 @@ export function SkeletonMetrics({ count = 4 }: { count?: number }) {
   );
 }
 
-export function SkeletonChart({ height = 168 }: { height?: number }) {
-  const heights = [38, 54, 46, 68, 58, 78, 64, 88, 72, 96, 84, 100, 90, 76];
-
-  return (
-    <div className="flex items-end gap-2 px-5 pb-2" style={{ height }}>
-      {heights.map((value, index) => (
-        <Skeleton
-          key={index}
-          className="min-w-0 flex-1 rounded-md"
-          style={{ height: `${value}%`, animationDelay: `${index * 55}ms` }}
-        />
-      ))}
-    </div>
-  );
-}
-
 export function SkeletonBars({ rows = 4 }: { rows?: number }) {
   return (
     <div className="space-y-5 px-5 py-5">
